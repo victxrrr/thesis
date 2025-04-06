@@ -50,6 +50,7 @@ hook
 problématique 
 exemple parlant de pq on doit accelerer
 
+#pagebreak()
 = Governing equations
 == Shallow water equations
 
@@ -67,6 +68,7 @@ exemple parlant de pq on doit accelerer
 
 #include "program_struct.typ"
 
+#pagebreak()
 = State of the art
 
 == Parallelization methods
@@ -85,6 +87,7 @@ exemple parlant de pq on doit accelerer
 
 #include "trends_swe.typ"
 
+#pagebreak()
 = Case studies
 
 == Toce
@@ -93,7 +96,7 @@ exemple parlant de pq on doit accelerer
 
 == Profiling
 
-
+#pagebreak()
 = Implementations
 == CPU
 
@@ -130,12 +133,18 @@ exemple parlant de pq on doit accelerer
 ==== Streams boundary / inner edges
 === Case studies results
 
+#pagebreak()
 = Perspectives
+
+#pagebreak()
 = Conclusion
+
+#pagebreak()
 = Acknowledgements
 
 #print-glossary(
  entry-list
 )
 
+#pagebreak()
 #bibliography("ref.bib", full:false)
