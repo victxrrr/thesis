@@ -1,0 +1,3 @@
+The last section presented a brief introduction to the wide range of possibilities for developing a GPU implementation of Watlab. Before discussing the approach we will take to achieve this, we first present the state of the art of solutions adopted by other researchers. 
+
+Given the high degree of data parallelism exhibited by SWE resolution, hydraulic solvers mainly focus on parallelization and accelerators to reduce computational times. 
