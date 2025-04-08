@@ -12,6 +12,7 @@
   justify: true,
 )
 #set figure.caption(separator: " - ")
+#set figure(gap: 5mm)
 //#set math.equation(numbering: it => emph[#numbering("(i)", it)])
 // #let numbered_eq(content) = math.equation(
 //     block: true,
@@ -29,6 +30,8 @@
 #set math.mat(delim: "[")
 
 #outline()
+#pagebreak()
+#outline(title: "Figures", target: figure.where(kind: image))
 
 #pagebreak()
 
@@ -99,6 +102,18 @@ exemple parlant de pq on doit accelerer
 #pagebreak()
 = Implementations
 == CPU
+
+=== What I did first ?
+
+// parler de ce que j'ai fait les premiers mois ?
+
+=== Going parallel
+
+#include "parallel_cpu.typ"
+
+=== The precision issue
+
+#include "nondeterm.typ"
 
 === Memory
 

@@ -7,10 +7,10 @@ Note that this section and the following are primarily based on the work of @Eij
 
 === Threads
 The building block of a parallel programming model implementing the shared memory paradigm is the thread. A thread is an execution context—that is, a set of register values that enables the CPU to execute a sequence of instructions. Each thread has its own stack for storing local variables and function calls, but it shares the heap of the parent process (i.e., an instance of a program) with other threads, and therefore shares global variables as well. \
-It is the operating system, through its scheduler, that decides which thread is executed, when, and on which processor. These scheduling decisions are often made at runtime and may vary from one execution to another @lee2016introduction. Therefore, if shared data is accessed concurrently by different threads, the final result may depend on which thread executes first—this is known as a race condition. To solve this problem, inter-thread synchronization is needed, typically through mechanisms such as locks, which allow only one thread to access a shared resource at a time while others wait. \
+It is the operating system, through its scheduler, that decides which thread is executed, when, and on which processor. These scheduling decisions are often made at runtime and may vary from one execution to another @lee2016introduction. Therefore, if shared data is accessed concurrently by different threads, the final result may depend on which thread executes first—this is known as a race condition. To solve this problem, inter-thread synchronization is needed, typically through mechanisms such as mutexes, which allow only one thread to access a shared resource at a time while others wait. \
 Finally, threads are dynamic in the sense that they can be created during program execution.
 
-C++ provides native support for threads and locks through the <thread> and <mutex> libraries. The pseudocode below demonstrates an example of thread spawning. The instructions to perform take the form of function.
+C++ provides native support for threads and mutexes through the <thread> and <mutex> libraries. The pseudocode below demonstrates an example of thread spawning. The instructions to perform take the form of function.
 ```cpp 
 void writeOutput(arg){ ... }              // job to do
 

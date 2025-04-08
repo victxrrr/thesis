@@ -83,8 +83,7 @@ To solve @SWE, we divide the computational domain into smaller two-dimensional _
 
     }
   )),
-  caption: [
-    Cell geometry
+  caption: [Cell geometry
   ]
 )<cell>
 
@@ -143,8 +142,7 @@ To solve @SWE, we divide the computational domain into smaller two-dimensional _
       content((4.5, -.25), text([$Omega_i$], size: 18pt))
     }
   )),
-  caption: [
-    Control volume
+  caption: [Control volume
   ]
 )<control>
 
