@@ -1,3 +1,0 @@
-The benefits of reordering the edges are twofold. First, it increases the probability of accessing nearby or contiguous edges when summing the flux balance within a cell. On the other hand, two adjacent cells are likely to have nearby edges in memory, further increasing memory coalescence. To illustrate and evaluate the quality of edge reordering, we propose the following metrics;
-- the maximum intra-cell distance between two indices of the edges that form its boundaries, that we denote by $eta_i$;
-- $Nu$ = N ?

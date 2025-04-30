@@ -1,0 +1,1 @@
+To evaluate the pros and cons of our ideas for accelerating Watlab, we need case studies where the hydraulic solver can be run to measure execution time. We will use two examples: one small-scale and one large-scale.

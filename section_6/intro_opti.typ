@@ -1,0 +1,1 @@
+In the first subsections, we identified bottlenecks inherent to GPU architecture that can impact performance, such as warp divergence and uncoalesced memory access. Some optimizations can address these issues and improve execution speed. We implemented a few on the _Proof of Concept_ to assess their effectiveness.

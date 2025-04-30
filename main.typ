@@ -1,4 +1,10 @@
 #import "@preview/glossarium:0.5.2": make-glossary, register-glossary, print-glossary, gls, glspl
+// #import "@preview/scholarly-epfl-thesis:0.2.0": template, front-matter, main-matter, back-matter
+
+// #show: template.with(author: "Victor Lepère")
+
+// #set page(numbering: none)
+// #show: front-matter
 
 #counter(page).update(n => n + 0)
 
@@ -33,13 +39,15 @@
 #pagebreak()
 #outline(title: "Figures", target: figure.where(kind: image))
 
+#outline(title: "Tables", target: figure.where(kind: table))
+
 #pagebreak()
 
 #show: make-glossary
 #let entry-list = (
   (
-    key: "kuleuven",
-    short: "KU Leuven",
+    key: "kul",
+    short: "KUL",
     long: "Katholieke Universiteit Leuven",
     description: "A university in Belgium.",
   ),
@@ -47,106 +55,136 @@
 )
 #register-glossary(entry-list)
 
+// #print-glossary(
+//  entry-list, show-all: true
+// )
+// 
+
+// #show: main-matter
+
 = Introduction
 
 hook 
 problématique 
-exemple parlant de pq on doit accelerer
+exemple parlant de pq on doit accelere
 
 #pagebreak()
 = Governing equations
 == Shallow water equations
 
-#include "SWE.typ"
+#include "section_2/SWE.typ"
 
 == Numerical scheme
 
-#include "FV.typ"
+#include "section_2/FV.typ"
 
 == Data parallelism
 
-#include "data_parallelism.typ"
+#include "section_2/data_parallelism.typ"
 
 == Program structure
 
-#include "program_struct.typ"
+#include "section_2/program_struct.typ"
 
 #pagebreak()
 = State of the art
 
 == Parallelization methods
 
-#include "parallel_methods.typ"
+#include "section_3/parallel_methods.typ"
 
 == Graphics Processing Units
 
-#include "state_gpu.typ"
+#include "section_3/state_gpu.typ"
 
 == The zoo of GPGPU languages
 
-#include "zoo.typ"
+#include "section_3/zoo.typ"
 
 == Trends in SWE solvers
 
-#include "trends_swe.typ"
+#include "section_3/trends_swe.typ"
 
 #pagebreak()
 = Case studies
 
+#include "section_4/intro_case_studies.typ"
+
 == Toce
+
+#include "section_4/toce.typ"
 
 == Theux
 
+#include "section_4/theux.typ"
+
 == Profiling
 
-#pagebreak()
-= Implementations
-== CPU
+#include "section_4/prof.typ"
 
-=== What I did first ?
+#pagebreak()
+= Implementations on CPU
+
+== What I did first ?
 
 // parler de ce que j'ai fait les premiers mois ?
 
-=== Going parallel
+== Going parallel
 
-#include "parallel_cpu.typ"
+#include "section_5/parallel_cpu.typ"
 
-=== The precision issue
+== The precision issue
 
-#include "nondeterm.typ"
+#include "section_5/nondeterm.typ"
 
-=== Memory
+== Scheduling
 
-#include "memory_cpu.typ"
+#include "section_5/scheduling.typ"
+
+== Memory <memory_section>
+
+#include "section_5/memory_cpu.typ" 
 
 == Case studies results
 
-#include "cpu_case_studies.typ"
+#include "section_5/cpu_case_studies.typ"
 
-== GPU
-=== Hardware
-=== Weaknesses & strengths
-==== Memory latencies
-==== Occupancy
+= Implementations on GPU
 
-=== Proof of Concept
+#include "section_6/intro_gpu.typ"
 
-#include "poc.typ"
+== Hardware
 
-==== Results
+#include "section_6/hardware_gpu.typ"
 
-#include "poc_results.typ"
+== CUDA programming model
+
+#include "section_6/software_gpu.typ"
+
+== Proof of Concept
+
+#include "section_6/poc.typ"
+
+=== Results
+
+#include "section_6/poc_results.typ"
 
 === Optimizations
-==== RCM
-==== Edge reordering
 
-#include "edge_reordering.typ"
+#include "section_6/intro_opti.typ"
 
+==== Mesh reordering
 
-==== SoA ?
-==== Streams boundary / inner edges
-=== Case studies results
+#include "section_6/edge_reordering.typ"
+
+==== Data layout
+
+#include "section_6/soa.typ"
+
+==== Arithmetic precision
+
+#include "section_6/floats.typ"
+
 
 #pagebreak()
 = Perspectives
@@ -157,9 +195,7 @@ exemple parlant de pq on doit accelerer
 #pagebreak()
 = Acknowledgements
 
-#print-glossary(
- entry-list
-)
+// #show: back-matter
 
 #pagebreak()
 #bibliography("ref.bib", full:false)

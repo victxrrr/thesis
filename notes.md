@@ -4,4 +4,5 @@ Pour la section sur les shallow water equations, le but ici est d'arriver au dev
 
 L'introduction doit parler du contexte dans lequel s'inscrit notre travail.
 
-uniform vs unstructured mesh. VAcondio2017 (see bib) propose an alternative approach for adaptive refinement of uniform mesh.
+uniform vs unstructured mesh. VAcondio2017 (see bib) propose an alternative
+approach for adaptive refinement of uniform mesh.
