@@ -161,7 +161,7 @@ We tested these strategies on the same test case as above to evaluate their effe
   ),
   [RCM + Sort], [$1.84 thick (plus.minus 0.04)$], [30.52],
   [RCM + Sort with boundary variant], [$1.84 thick (plus.minus 0.04)$], [30.54],
-), caption: [Total execution times]),
+), gap: .75em, caption: [Total execution times]),
 <poc_rcm>,
   figure(table(
     columns: (16%, 21%, 31.5%, 31.5%),
@@ -173,7 +173,7 @@ We tested these strategies on the same test case as above to evaluate their effe
     ),
     [RCM + Sort], [$0.90 thick (plus.minus 0.003)$], [$4.33 thick (plus.minus 0.015)$], [$63.93 thick (plus.minus 0.214)$],
     [Variant], [$0.90 thick (plus.minus 0.003)$], [$4.32 thick (plus.minus 0.014)$], [$63.90 thick (plus.minus 0.210)$], 
-  ), caption: [Flux kernel profiling]),
+  ), gap: .75em, caption: [Flux kernel profiling]),
   <rcm_ker>,
   figure(table(
     columns: (16%, 21%, 31.5%, 31.5%),
@@ -185,7 +185,7 @@ We tested these strategies on the same test case as above to evaluate their effe
     ),
     [RCM + Sort], [$0.29 thick (plus.minus 0.004)$], [$4.51 thick (plus.minus 0.053)$], [$86.68 thick (plus.minus 0.487)$], 
     [Variant], [$0.29 thick (plus.minus 0.004)$], [$4.52 thick (plus.minus 0.056)$], [$86.62 thick (plus.minus 0.500)$], 
-  ), caption: [Update kernel profiling]),
+  ), gap: .75em, caption: [Update kernel profiling]),
   figure(table(
     columns: (16%, 21%, 31.5%, 31.5%),
     table.header(
@@ -196,11 +196,15 @@ We tested these strategies on the same test case as above to evaluate their effe
     ),
     [RCM + Sort], [$0.15 thick (plus.minus 0.000)$], [$9.42 thick (plus.minus 0.025)$], [$95.32 thick (plus.minus 0.214)$],
     [Variant], [$0.15 thick (plus.minus 0.000)$], [$9.42 thick (plus.minus 0.025)$], [$95.29 thick (plus.minus 0.183)$], 
-  ), caption: [Min reduction profiling]),
+  ),  gap: .75em, caption: [Min reduction profiling]),
   columns: 1,
   caption: [Timings of AdaptiveCpp implementation with reordered mesh (Toce _XL_)],
   kind: table,
   //label: <ncu>
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )
 
 We observe that the new reordering effectively reduces the execution time and the speedup factor increases from $~24$ to $~30.5$. Kernel profiling shows an increase in memory throughput, indicating an improvement in memory coalescence, that results in a decrease in the execution time. However, the boundary variant does not improve performance. We justify this by noting that warp divergence is not very pronounced in the PoC: boundary edges simply skip the mean water height computation, but as shown by kernel profiling, the limiting factor is memory access rather than computational load. Moreover, the reordering variant, while reducing warp divergence, also reduces spatial locality because the indices of the cells sharing a boundary interface are not direct neighbors except at corners. Finally, the number of boundary interfaces remains negligible compared to the number of inner interfaces in a large mesh as used in the test case.

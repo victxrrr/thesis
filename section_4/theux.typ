@@ -23,29 +23,39 @@
       [\# Cells]
     ),
     [Toce], [6 716], [19 731], [12 996],
+    [Toce _XL_], [406 115], [1 214 591], [808 457],
     [Theux], [XXX], [XXX], [XXX],
   ) , 
+    gap: .75em,
     caption: [
     Geometric description of meshes
-  ]), <meshes>,
+  ],
+  ), <meshes>,
   figure(
     table(
-    columns: (1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
+    columns: (1fr, 1fr, 1fr),
     table.header(
-      [Case study],
-      [$t_"start"$ [#unit[s]]],
-      [$t_"end"$ [#unit[s]]],
-      [$sigma$ [#unit[-]]],
-      [$Delta t_"pics"$ [#unit[s]]],
-      [$Delta t_"gauges"$ [#unit[s]]],
+      [Parameter],
+      [Toce],
+      [Theux],
     ),
-    [Toce], [7], [60], [0.9], [1], [1],
-    [Theux], [XXX], [XXX], [XXX],
+    [$t_"start"$ [#unit[s]]], [7], [],
+    [$t_"end"$ [#unit[s]]], [60], [],
+    [$sigma$ [#unit[-]]], [0.9], [],
+    [$Delta t_"pics"$ [#unit[s]]], [1], [],
+    [$Delta t_"gauges"$ [#unit[s]]], [1], [],
+    [$Delta t_"sections"$ [#unit[s]]], [1], [],
+    [$Delta t_"enveloppes"$ [#unit[s]]], [1], []
     ), 
+    gap: .75em,
     caption: [
     Simulation parameters
   ]), <simulations>,
   columns: 1,
   caption: [Case study descriptions],
-  kind: table
+  kind: table,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )

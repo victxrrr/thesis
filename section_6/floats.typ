@@ -26,7 +26,7 @@ To illustrate the impact of arithmetic precision on GPU performance, we implemen
     [Duration [#unit[s]]],
   ),
   [SoA (reordered mesh + floats)], [$260 thick (plus.minus 16)$],
-), caption: [Total execution time]),
+), gap: .75em, caption: [Total execution time]),
 <floats_total>,
   figure(table(
     columns: (16%, 21%, 31.5%, 31.5%),
@@ -39,12 +39,16 @@ To illustrate the impact of arithmetic precision on GPU performance, we implemen
     [Flux], [$72.28 thick (plus.minus 2.559)$], [$20.21 thick (plus.minus 0.645)$], [$94.63 thick (plus.minus 0.130)$],
     [Update], [$55.64 thick (plus.minus 2.042)$], [$20.68 thick (plus.minus 0.688)$], [$93.25 thick (plus.minus 0.196)$],  
     [Reduction], [$33.98 thick (plus.minus 0.504)$], [$8.55 thick (plus.minus 0.127)$], [$55.85 thick (plus.minus 1.018)$], 
-  ), caption: [Per-kernel profilings]),
+  ), gap: .75em, caption: [Per-kernel profilings]),
   <float_ker>,
   columns: 1,
   caption: [Profile of AdaptiveCpp implementation with FP32 precision],
   kind: table,
-  label: <float_prof>
+  label: <float_prof>,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )
 
 Although this proof of concept is memory bound rather than compute bound, total execution time is reduced by about a factor of two. Kernel profiles show lower timings despite decreased compute throughput, indicating that FP32 resources remain underutilized. The update kernel is now over twice as fast, and the other two also show notable gains.

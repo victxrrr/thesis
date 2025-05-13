@@ -65,6 +65,10 @@ the maximum relative error tend to increase over time. We also plotted the cells
   columns: (1fr, 1fr),
   caption: [Nondeterministic behavior of parallel implementation],
   label: <fig_nondeterm>,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1.5em
 )
 
 // #subpar.grid(

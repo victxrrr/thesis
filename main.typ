@@ -1,7 +1,7 @@
 #import "@preview/glossarium:0.5.2": make-glossary, register-glossary, print-glossary, gls, glspl
-// #import "@preview/scholarly-epfl-thesis:0.2.0": template, front-matter, main-matter, back-matter
+#import "template.typ": template, front-matter, main-matter, back-matter
 
-// #show: template.with(author: "Victor Lepère")
+#show: template.with(author: "Victor Lepère")
 
 // #set page(numbering: none)
 // #show: front-matter
@@ -62,6 +62,39 @@
 
 // #show: main-matter
 
+#import "@preview/suboutline:0.3.0": suboutline
+// #show heading: set text(11pt, weight: "regular")
+// #show heading.where(level: 1): it => {
+//   {
+//     set align(right)
+//     set par(spacing: 5mm)
+//     let number = counter(heading.where(level: 1)).display()
+//     text(90pt, rgb("#cd5454"), strong(number))
+//     parbreak()
+//     text(20pt, it.body)
+//   }
+//   line(length: 100%)
+//   show outline.entry: it => {
+//     let body = {
+//       box(stroke: red, outset: 1pt)[#it.prefix()#h(1.5em)#it.body()]
+//       h(4mm)
+//       box(width: 1fr, it.fill)
+//       h(7mm)
+//       it.page()
+//     }
+//     pad(left: 1.5cm, right: 1cm, link(it.element.location(), body))
+//   }
+//   suboutline(fill: repeat(gap: 0.5em)[.])
+//   line(length: 100%)
+// }
+// 
+#let minioutline() = {
+  line(length: 100%)
+  v(1%)
+  suboutline(fill: repeat([#h(2.5pt) . #h(2.5pt)]))
+  line(length: 100%)
+}
+
 = Introduction
 
 hook 
@@ -69,7 +102,9 @@ problématique
 exemple parlant de pq on doit accelere
 
 #pagebreak()
-= Governing equations
+= Governing equations <ch2>
+#minioutline()
+
 == Shallow water equations
 
 #include "section_2/SWE.typ"
@@ -88,6 +123,7 @@ exemple parlant de pq on doit accelere
 
 #pagebreak()
 = State of the art
+#minioutline()
 
 == Parallelization methods
 
@@ -107,6 +143,7 @@ exemple parlant de pq on doit accelere
 
 #pagebreak()
 = Case studies
+#minioutline()
 
 #include "section_4/intro_case_studies.typ"
 
@@ -118,18 +155,17 @@ exemple parlant de pq on doit accelere
 
 #include "section_4/theux.typ"
 
-== Profiling
-
-#include "section_4/prof.typ"
-
 #pagebreak()
 = Implementations on CPU
+#minioutline()
 
-== What I did first ?
+#include "section_5/intro.typ"
 
-// parler de ce que j'ai fait les premiers mois ?
+== Profiling of Toce case study
 
-== Going parallel
+#include "section_5/prof.typ"
+
+== Going parallel <parallel_section>
 
 #include "section_5/parallel_cpu.typ"
 
@@ -145,11 +181,12 @@ exemple parlant de pq on doit accelere
 
 #include "section_5/memory_cpu.typ" 
 
-== Case studies results
+== Benchmarks
 
 #include "section_5/cpu_case_studies.typ"
 
 = Implementations on GPU
+#minioutline()
 
 #include "section_6/intro_gpu.typ"
 
@@ -161,7 +198,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_6/software_gpu.typ"
 
-== Proof of Concept
+== Proof of Concept <poc_section>
 
 #include "section_6/poc.typ"
 
@@ -185,6 +222,27 @@ exemple parlant de pq on doit accelere
 
 #include "section_6/floats.typ"
 
+== GPU port of Watlab
+
+=== Program structure
+
+#include "section_6/gpu_port.typ"
+
+=== Polymorphism challenges
+
+#include "section_6/poly.typ"
+
+=== Managing data transfers
+
+#include "section_6/usm.typ"
+
+=== CPU-GPU synchronization
+
+#include "section_6/sync.typ"
+
+=== Benchmarks 
+
+#include "section_6/bench.typ"
 
 #pagebreak()
 = Perspectives

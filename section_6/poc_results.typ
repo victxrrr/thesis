@@ -99,7 +99,7 @@ A more reliable way to compare them is to use GPU specific profiling tools such 
       [CUDA], [$1.38 thick (plus.minus 0.004)$], [$2.8 thick (plus.minus 0.009)$], [$47.758 thick (plus.minus 0.123)$],
       [Kokkos], [$1.384 thick (plus.minus 0.005)$], [$2.796 thick (plus.minus 0.008)$], [$47.596 thick (plus.minus 0.140)$],
       [AdaptiveCpp], [$1.38 thick (plus.minus 0.005)$], [$2.799 thick (plus.minus 0.009)$], [$47.757 thick (plus.minus 0.140)$],
-    ), caption: [Flux kernel]),
+    ), gap: .75em, caption: [Flux kernel]),
   figure(table(
     columns: (16%, 21%, 31.5%, 31.5%),
     table.header(
@@ -111,7 +111,7 @@ A more reliable way to compare them is to use GPU specific profiling tools such 
     [CUDA], [$0.29 thick (plus.minus 0.004)$], [$4.522 thick (plus.minus 0.058)$], [$86.744 thick (plus.minus 0.408)$],
     [Kokkos], [$0.293 thick (plus.minus 0.005)$], [$4.46 thick (plus.minus 0.029)$], [$85.448 thick (plus.minus 0.466)$],
     [AdaptiveCpp], [$0.291 thick (plus.minus 0.004)$], [$4.515 thick (plus.minus 0.058)$], [$86.578 thick (plus.minus 0.516)$],
-  ), caption: [Update kernel]),
+  ), gap: .75em, caption: [Update kernel]),
   figure(table(
     columns: (16%, 21%, 31.5%, 31.5%),
     table.header(
@@ -123,11 +123,15 @@ A more reliable way to compare them is to use GPU specific profiling tools such 
     [CUDA], [$0.15 thick (plus.minus 0.000)$], [$14.18 thick (plus.minus 0.067)$], [$97.57 thick (plus.minus 0.364)$],
     [Kokkos], [$0.151 thick (plus.minus 0.003)$], [$12.434 thick (plus.minus 0.044)$], [$91.054 thick (plus.minus 0.290)$],
     [AdaptiveCpp], [$0.15 thick (plus.minus 0.000)$], [$9.42 thick (plus.minus 0.022)$], [$95.30 thick (plus.minus 0.171)$],
-  ), caption: [Min reduction]),
+  ), gap: .75em, caption: [Min reduction]),
   columns: 1,
   caption: [Per-kernel profiling],
   kind: table,
-  label: <ncu>
+  label: <ncu>,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )
 This analysis shows that abstraction libraries are competitive with naive CUDA code while offering simplicity and portability. Furthermore, the low compute throughput shows that this PoC is an example of a memory bound algorithm. Between the two libraries we will choose AdaptiveCpp because its generic compiler feature allows the use of a single binary while maintaining competitive performance.
 

@@ -245,7 +245,7 @@ We observe that the lowest execution times are achieved with the Structure of Ar
       [AoSoA{16}], [$195.02 thick (plus.minus 2.531)$], [$40.66 thick (plus.minus 0.526)$], [$80.12 thick (plus.minus 0.125)$],
       [AoSoA{16} (reordered mesh)], [$162.82 thick (plus.minus 0.288)$], [$49.13 thick (plus.minus 0.139)$], [$95.23 thick (plus.minus 0.083)$], 
 
-    ), caption: [Flux kernel]),  
+    ), gap: .75em, caption: [Flux kernel]),  
   figure(table(
     columns: (30%, 20%, 25%, 25%),
     table.header(
@@ -260,7 +260,7 @@ We observe that the lowest execution times are achieved with the Structure of Ar
     [SoA (reordered mesh)], [$130.24 thick (plus.minus 2.048)$], [$30.78 thick (plus.minus 0.388)$], [$95.39 thick (plus.minus 0.211)$],
     [AoSoA{16}], [$128.33 thick (plus.minus 2.529)$], [$31.12 thick (plus.minus 0.400)$], [$95.34 thick (plus.minus 0.177)$],
     [AoSoA{16} (reordered mesh)], [$128.09 thick (plus.minus 1.877)$], [$31.11 thick (plus.minus 0.418)$], [$95.34 thick (plus.minus 0.183)$], 
-  ), caption: [Modified update kernel]),
+  ), gap: .75em, caption: [Modified update kernel]),
   figure(table(
     columns: (30%, 20%, 25%, 25%),
     table.header(
@@ -275,11 +275,15 @@ We observe that the lowest execution times are achieved with the Structure of Ar
     [SoA (reordered mesh)], [$44.12 thick (plus.minus 0.363)$], [$32.75 thick (plus.minus 0.243)$], [$83.80 thick (plus.minus 0.750)$],
     [AoSoA{16}], [$45.21 thick (plus.minus 0.352)$], [$31.93 thick (plus.minus 0.263)$], [$81.59 thick (plus.minus 0.687)$],
     [AoSoA{16} (reordered mesh)], [$45.29 thick (plus.minus 0.329)$], [$31.95 thick (plus.minus 0.293)$], [$81.41 thick (plus.minus 0.635)$], 
-  ), caption: [Min reduction]),
+  ), gap: .75em, caption: [Min reduction]),
   columns: 1,
   caption: [Per-kernel profiling],
   kind: table,
-  label: <soa_ker>
+  label: <soa_ker>,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )
 
 The kernel timings align more closely with expectations. In the update kernel, the AoSoA and SoA layouts slightly improve memory throughput, but since throughput was already high in AoS, execution time differences are minor. In contrast, the flux kernel shows more variation. Here, mesh reordering significantly increases bandwidth usage across layouts, reducing mean execution times. Even without reordering, the AoSoA layout with block size 16 benefits from high memory throughput due to its tiled structure. However, compute throughput is also higher because of additional operations needed to access elements in the blocked layout, leading to suboptimal performance compared to SoA. In a more compute-intensive kernel, the indexing overhead may become negligible, making the layout more favorable. SoA generally performs best, especially with mesh reordering, achieving very low timings and showing a speedup of 14x compared to @ncu profiling. Finally, the AoS layout underperforms relative to the other two in the reduction kernel.

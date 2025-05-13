@@ -16,9 +16,8 @@ Watlab is publicly available @Watlab as a Python package and can be easily insta
 Our work primarily focuses on the computational code written in C++, though we may also modify the Python module if, for example, mesh reorganization is needed. A summary diagram of the high-level architecture is shown in @high. 
 Also note that the C++ code may sometimes be referred as _Hydroflow_.
 
-#let blob(pos, label, w, tint: white, ..args) = node(
+#let blob(pos, label, tint: white, ..args) = node(
 	pos, align(center, label),
-	width: w,
 	fill: tint.lighten(60%),
 	stroke: 1pt + tint.darken(20%),
 	corner-radius: 5pt,
@@ -37,14 +36,14 @@ Also note that the C++ code may sometimes be referred as _Hydroflow_.
 
       node((0, -1.75), align(center, [Mesh file]), name: <mesh>),
       edge("-|>"),
-      blob((0, -0.25), [*Watlab.py* \ Python API], 30mm, tint: gray, name: <watlab>),
-      blob((0, 1.5), [*Binary*], 30mm, tint: gray, name: <binary>),
+      blob((0, -0.25), [*Watlab.py* \ Python API], width: 25mm, tint: gray, name: <watlab>),
+      blob((0, 1.5), [*Binary*], width: 25mm, tint: gray, name: <binary>),
       edge("-|>"),
       node((0, 3), align(center, [Output files]), name: <output>),
       
       node((.5, .725), align(center, [Input files])),
 
-      blob((-3.5, 1.5), [*Hydroflow* \ C++ source], 30mm, tint: gray, name: <hydroflow>),
+      blob((-3.5, 1.5), [*Hydroflow* \ C++ source], width: 25mm, tint: gray, name: <hydroflow>),
       node((-1.8, 1.15), align(center, [_Compilation_])),
 
       node(enclose: ((-1, 4), (1, -2)), stroke: (paint: gray, dash: "dashed"), fill: none, corner-radius: 10pt),
@@ -217,22 +216,27 @@ The update process involves computing numerical fluxes at each interface, calcul
 	mark-scale: 70%,
   debug: 0,
 
-  blob((0, -1.25), [Initialization], 35mm, tint: gray, name: <h2d>),
+  let dy = 1.25,
+  blob((0, -dy), [Initialization], tint: gray, name: <h2d>),
 
-  blob((0, -0.), [Time to output ?], 35mm, tint: gray, name: <if>),
-  blob((-.75, 0.8), [Write data], 30mm, tint: green, name: <yes>),
+  blob((0, -0.), [Time to output ?], tint: gray, name: <if>),
+  blob((-.75, 0.8), [Write data], tint: green, name: <yes>),
 
-  blob((0, 1.5), [$bold(F)^*_j$ #h(.5em) *for each* interface ], 47mm, tint: blue, name: <flux>),
+  let pos = 1.5,
+  blob((0, pos), [$bold(F)^*_j$ #h(.5em) *for each* interface ], tint: blue, name: <flux>),
 
-  blob((0, 2.75), [$bold(S)_i^*$ #h(.5em) *for each* cell], 35mm, tint: blue, name: <update>),
+  pos += dy,
+  blob((0, pos), [$bold(S)_i^*$ #h(.5em) *for each* cell], tint: blue, name: <update>),
 
-  blob((0, 4), [$bold(U)_i^(n+1) = bold(U)_i^n - (Delta t \/ abs(cal(C)_i)) sum_(j) bold(T)^(-1)_j bold(F)^*_j  L_j + bold(S)_i^* Delta t$ #h(.5em) *for each* cell], 110mm, tint: blue, height: 9mm, name: <min>),
+  pos += dy,
+  blob((0, pos), [$bold(U)_i^(n+1) = bold(U)_i^n - (Delta t \/ abs(cal(C)_i)) sum_(j) bold(T)^(-1)_j bold(F)^*_j  L_j + bold(S)_i^* Delta t$ #h(.5em) *for each* cell],  tint: blue, height: 9mm, name: <min>),
 
-  blob((0, 5.35), [$Delta t = min_i ( (Delta x)/(abs(u) + c) )_i$], 37.5mm, height: 9mm, tint: red, name: <red>),
+  pos += dy*1.075,
+  blob((0, pos), [$Delta t = min_i ( (Delta x)/(abs(u) + c) )_i$], height: 9mm, tint: red, name: <red>),
 
-  blob((0, 7), [$t >= t_"end"$ ?], 35mm, tint: gray, name: <d2h>),
+  blob((0, 7), [$t >= t_"end"$ ?], tint: gray, name: <d2h>),
 
-   blob((0, 8.25), [Termination], 35mm, tint: gray, name: <end>),
+   blob((0, 8.25), [Termination], tint: gray, name: <end>),
 
   edge(<h2d>, <if>, "-|>"),
   edge(<flux>, <update>, "-|>"),

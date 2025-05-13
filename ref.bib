@@ -197,6 +197,15 @@ isbn="978-3-031-10419-0"
   pages={805-817},
   doi={10.1109/TPDS.2021.3097283}}
 
+  @misc{kokkosDoc,
+  author       = {Carter Edwards and Christian Trott and Daniel Sunderland and others},
+  title        = {Kokkos Programming Guide, Chapter 14: Kokkos and Virtual Functions},
+  year         = {2022},
+  howpublished = {\url{https://kokkos.org/kokkos-core-wiki/ProgrammingGuide/Kokkos-and-Virtual-Functions.html}},
+  note         = {Accessed: 2025-05-03}
+}
+
+
   @inproceedings{Alpaka,
   author    = {Erik Zenker and Benjamin Worpitz and Ren{\'{e}} Widera
                and Axel Huebl and Guido Juckeland and
@@ -746,6 +755,55 @@ keywords = {Flood simulation, Parallel computing, GPU, Shallow Water, Finite Vol
 abstract = {In this paper a parallelization of a Shallow Water numerical scheme suitable for Graphics Processor Unit (GPU) architectures under the NVIDIA™'s Compute Unified Device Architecture (CUDA) framework is presented. In order to provide robust and accurate simulations of real flood events, the system features a state-of-the-art Finite Volume explicit discretization technique which is well balanced, second order accurate and based on positive depth reconstruction. The model is based on a Cartesian grid and boundary conditions are implemented by means of the implicit local ghost cell approach, which enables the discretization of a broad spectrum of boundary conditions including inflow/outflow conditions. A novel and efficient Block Deactivation Optimization procedure has also been adopted, in order to increase the efficiency of the numerical scheme in the presence of wetting-drying fronts. This led to speedups of two orders of magnitude with respect to a single-core CPU. The code has been validated against several severe benchmark test cases, and its capability of producing accurate fast simulations (with high ratios between physical and computing times) for different real world cases has been shown.}
 }
 
+@article{10.1145/872726.806987,
+author = {Graham, Susan L. and Kessler, Peter B. and Mckusick, Marshall K.},
+title = {Gprof: A call graph execution profiler},
+year = {1982},
+issue_date = {June 1982},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {17},
+number = {6},
+issn = {0362-1340},
+url = {https://doi-org.kuleuven.e-bronnen.be/10.1145/872726.806987},
+doi = {10.1145/872726.806987},
+abstract = {Large complex programs are composed of many small routines that implement abstractions for the routines that call them. To be useful, an execution profiler must attribute execution time in a way that is significant for the logical structure of a program as well as for its textual decomposition. This data must then be displayed to the user in a convenient and informative way. The gprof profiler accounts for the running time of called routines in the running time of the routines that call them. The design and use of this profiler is described.},
+journal = {SIGPLAN Not.},
+month = jun,
+pages = {120–126},
+numpages = {7}
+}
+
+@article{gprof,
+author = {Graham, Susan L. and Kessler, Peter B. and McKusick, Marshall K.},
+title = {gprof: a call graph execution profiler},
+year = {2004},
+issue_date = {April 2004},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {39},
+number = {4},
+issn = {0362-1340},
+url = {https://doi-org.kuleuven.e-bronnen.be/10.1145/989393.989401},
+doi = {10.1145/989393.989401},
+abstract = {We extended the UNIX® system's profiler by gathering arcs in the call graph of a program. Here is it 20 years later and this profiler is still in daily use. Why is that? It's not because there aren't well-known areas for improvement.Large complex programs are composed of many small routines that implement abstractions for the routines that call them. To be useful, an execution profiler must attribute execution time in a way that is significant for the logical structure of a program as well as for its textual decomposition. This data must then be displayed to the user in a convenient and informative way. The gprof profiler accounts for the running time of called routines in the running time of the routines that call them. The design and use of this profiler is described.},
+journal = {SIGPLAN Not.},
+month = apr,
+pages = {49–57},
+numpages = {9}
+}
+
+@inbook{Encyclopedia,
+author = {Robert, Yves and Shende, Sameer and Malony, Allen and Morris, Alan and Spear, Wyatt and Biersdorff, Scott and Smith, Burton and Wang, Dali and Ricciuto, Daniel and Post, Wilfred and Berry, Michael and Irigoin, François and Yelick, Katherine and Graham, S.L. and Hilfinger, Paul and Bonachea, Dan and Kamil, Amir and Datta, Kaushik and Moss, J.},
+year = {2011},
+month = {01},
+pages = {2025-2029},
+title = {Encyclopedia of Parallel Computing},
+isbn = {978-0-387-09765-7},
+doi = {10.1007/978-0-387-09766-4_59}
+}
+
+
 @article{LACASTA20141,
 title = {An optimized GPU implementation of a 2D free surface simulation model on unstructured meshes},
 journal = {Advances in Engineering Software},
@@ -1103,4 +1161,13 @@ title = {Implementation of a Fully-Parallel Turbo Decoder on a General-Purpose G
 volume = {4},
 journal = {IEEE Access},
 doi = {10.1109/ACCESS.2016.2586309}
+}
+
+
+@misc{adaptivecpp_performance,
+  author       = {{AdaptiveCpp Contributors}},
+  title        = {Performance Documentation -- AdaptiveCpp},
+  year         = {2025},
+  howpublished = {\url{https://github.com/AdaptiveCpp/AdaptiveCpp/blob/develop/doc/performance.md}},
+  note         = {Accessed: 2025-05-10}
 }

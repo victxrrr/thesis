@@ -17,9 +17,18 @@ Finally, we slightly modified the implementation of the minimum computation. The
 
 This can be improved using a parallel reduction, which resembles a tournament: first, threads form pairs and compare values in parallel, then winners form new pairs and repeat the process until one thread remains. This reduces the global minimum in $log_2(T)$ steps instead of $T$, where $T$ is the number of threads. An illustrative diagram of the reduction strategy is shown in @reduction. While this optimization may have little impact with the small number of cores typical in modern CPUs, it becomes significant for GPU implementations with many more cores. For example, 2560 parallel processes would require only 12 reduction rounds.
 
-#import "@preview/fletcher:0.5.2" as fletcher: diagram, node, edge
-#figure(
-  scale( 92.5%, 
+#import "@preview/fletcher:0.5.3" as fletcher: diagram, node, edge, measure-node-size
+
+#let scale_width(canvas) = {
+  context {
+    let canvas-size = measure(canvas)
+    layout(size => {
+      scale(size.width/canvas-size.width * 100%, canvas)
+    })  
+  }
+}
+
+#let c = {
   diagram(
 	spacing: 8pt,
 	cell-size: (8mm, 10mm),
@@ -36,7 +45,8 @@ This can be improved using a parallel reduction, which resembles a tournament: f
     edge((-1 + v * 2, -.75), (-1+ v * 2, -1.5))
   },
 
-  node((0, 0), [13], name: <13>),
+  node((0, 0), [#set text(size:13pt)
+  13], name: <13>),
   node((2, 0), [27], name: <27>),
   node((4, 0), [15], name: <15>),
   node((6, 0), [14], name: <14>),
@@ -75,8 +85,11 @@ This can be improved using a parallel reduction, which resembles a tournament: f
 
   edge(<222>, <2222>, "-|>"),
   edge(<131313>, <2222>, "-|>")
+)
+}
 
-)), caption: [Minimum reduction]
+#figure(
+  scale_width(c), caption: [Minimum reduction]
 )<reduction>
 
 Fortunately, OpenMP provides built-in support for parallel reduction via the reduction keyword, abstracting implementation details and simplifying the code, as shown in the following pseudocode:
@@ -88,25 +101,32 @@ for (int i = 0; i < nCells; i++) {
 ```
 The updated structure of the final parallel implementation is shown in @hydroflow_parallel.
 
-#let light_blob(pos, label, w, tint: white, ..args) = node(
+#let light_blob(pos, label, tint: white, ..args) = node(
 	pos, align(center, label),
-	width: w,
 	fill: tint.lighten(90%),
 	stroke: 1pt + tint.lighten(30%),
 	corner-radius: 5pt,
 	..args,
 )
 
-#let blob(pos, label, w, tint: white, ..args) = node(
+#let blob(pos, label, tint: white, ..args) = node(
 	pos, align(center, label),
-	width: w,
 	fill: tint.lighten(70%),
 	stroke: 1pt + tint.darken(20%),
 	corner-radius: 5pt,
 	..args,
 )
 
-#figure(placement: auto, diagram(
+#let scale_width2(canvas) = {
+  context {
+    let canvas-size = measure(canvas)
+    layout(size => {
+      scale(100%, canvas)
+    })  
+  }
+}
+
+#figure(placement: auto, gap: 10pt, scale_width2(diagram(
 	spacing: 8pt,
 	cell-size: (8mm, 10mm),
 	edge-stroke: 1pt,
@@ -115,82 +135,80 @@ The updated structure of the final parallel implementation is shown in @hydroflo
   debug: 0,
 
   let pos = 0,
-  blob((0, pos -1.25), [Initialization], 35mm, tint: gray, name: <h2d>),
-
-  blob((0, pos), [Time to output ?], 35mm, tint: gray, name: <if>),
+  let dy = 1.25,
+  let shadow = .025,
+  let output_dx = -.85,
+  blob((0, pos - dy), [Initialization], tint: gray, name: <h2d>),
+  edge("-|>"),
+  blob((0, pos), [Time to output ?], tint: gray, name: <if>),
 
   let side = pos,
-  side += 1,
-  blob((-.8, side), [Has previous output finished ?], 60mm, tint: gray, name: <yes>),
-  side += 1.325,
+  side += dy,
+  blob((output_dx, side), [Has previous \ output finished ?], tint: gray, name: <yes>),
+  edge(<yes.south-east>, "-|>", <yes.north-east>, [no],  bend: -125deg, label-pos: .6),
+  side += 1.15*dy,
+  edge("-|>", label: "yes", label-side: left),
+  blob((output_dx, side), [Buffer data], tint: green, name: <save>),
+  side += dy,
   edge("-|>"),
-  blob((-.8, side), [Buffer data], 25mm, tint: green, name: <save>),
-  side += 1.325,
-  edge("-|>"),
-  blob((-.8, side), [Write data], 25mm, tint: green, name: <write>),
+  blob((output_dx, side), [Write data], tint: green, name: <write>),
   
-  pos += 1.5,
-  light_blob((0+.05, pos), [ $ quad$], 47mm, tint: blue, name: <last_flux>),
+  pos += dy,
+  light_blob((2*shadow, pos), [ $ quad$], width: 41mm, tint: blue, name: <last_flux>),
+  edge(<if.south>, (<last_flux.north-west>, 85%, <last_flux.north>), "-|>"),
   pos += .15,
-  light_blob((0+.025, pos), [ $ quad$], 47mm, tint: blue),
+  light_blob((shadow, pos), [ $ quad$], width: 41mm, tint: blue),
   pos += .15,
-  blob((0, pos), [$bold(F)_j^*$ #h(.5em) *for each* interface ], 47mm, tint: blue, name: <flux>),
+  blob((0, pos), [$bold(F)_j^*$ #h(.5em) *for each* interface ], tint: blue, name: <flux>),
 
-  pos += 1.325,
-  light_blob((0.05, pos), [$quad$], 35mm, tint: blue),
+  pos += dy,
+  light_blob((2*shadow, pos), [$quad$], width: 32mm, tint: blue, name: <last_source>),
+  edge(<flux.south>, (<last_source.north-west>, 80%, <last_source.north>), "-|>"),
   pos += .15,
-  light_blob((0.025, pos), [$quad$], 35mm, tint: blue),
+  light_blob((shadow, pos), [$quad$], width: 32mm, tint: blue),
   pos += .15,
-  blob((0, pos), [$bold(S)_i^*$ #h(.5em) *for each* cell], 35mm, tint: blue, name: <update>),
+  blob((0, pos), [$bold(S)_i^*$ #h(.5em) *for each* cell], tint: blue, name: <update>),
 
-  pos += 1.325,
-  blob((0, pos), [Has data been buffered ?], 50mm, tint: gray, name: <buf>),
-  pos += 1.5,
+  pos += dy,
+  blob((0, pos), [Has data been buffered ?], tint: gray, name: <buf>),
+  edge(<buf.south-east>, "-|>", <buf.north-east>, [no],  bend: -135deg, label-pos: .6),
+  pos += dy*1.125,
 
-  light_blob((0.05, pos), [$quad$], 110mm, height: 9mm, tint:blue),
+  light_blob((2*shadow, pos), [$quad$], width: 104.5mm, height: 9mm, tint:blue, name: <last_update>),
+  edge(<buf.south>, (<last_update.north-west>, 60%, <last_update.north>), "-|>", label: [yes], label-side: left),
   pos += .15,
-  light_blob((0.025, pos), [$quad$], 110mm, height: 9mm, tint:blue),
+  light_blob((shadow, pos), [$quad$], width: 104.5mm, height: 9mm, tint:blue),
   // blob((0, 5.80 + .3), [$bold(U)_i^(n+1) = bold(U)_i^n - (Delta t)/A_i sum bold(F)^*_(i,j) n_(i,j) L_(i,j) + bold(S)_i^* Delta t$ #h(.5em) *for each* cell], 100mm, tint: blue, name: <min>),
   pos += .15,
-  blob((0, pos), [$bold(U)_i^(n+1) = bold(U)_i^n - (Delta t \/ abs(cal(C)_i)) sum_(j) bold(T)^(-1)_j bold(F)^*_j  L_j + bold(S)_i^* Delta t$ #h(.5em) *for each* cell], 110mm, tint: blue, height: 9mm, name: <min>),
+  blob((0, pos), [$bold(U)_i^(n+1) = bold(U)_i^n - (Delta t \/ abs(cal(C)_i)) sum_(j) bold(T)^(-1)_j bold(F)^*_j  L_j + bold(S)_i^* Delta t$ #h(.5em) *for each* cell], tint: blue, height: 9mm, name: <min>),
 
-  pos += 1.5,
-  light_blob((0.05, pos), [$quad$], 37.5mm, height: 9mm, tint: red),
+  pos += dy*1.2,
+  light_blob((0.05, pos), [$quad$], width: 35.5mm, height: 9mm, tint: red, name: <last_min>),
+  edge(<min.south>, (<last_min.north-west>, 82.5%, <last_min.north>), "-|>", label: [yes], label-side: left),
+
   pos += .15,
-  light_blob((0.025, pos), [$quad$], 37.5mm, height: 9mm, tint: red),
+  light_blob((0.025, pos), [$quad$], width: 35.5mm, height: 9mm, tint: red),
   // blob((0, 7.35 + 2*.15), [ $Delta t = min (Delta x)/(abs(u_i) + c_i)$], 35mm, tint: red, name: <d2h>),
   pos += .15,
-  blob((0, pos), [$Delta t = min_i ( (Delta x)/(abs(u) + c) )_i$], 37.5mm, height: 9mm, tint: red, name: <red>),
+  blob((0, pos), [$Delta t = min_i ( (Delta x)/(abs(u) + c) )_i$], height: 9mm, tint: red, name: <red>),
 
-  pos += 1.65,
-  blob((0, pos), [$t >= t_"end"$ ?], 35mm, tint: gray, name: <d2h>),
-  pos += 1.3,
-  blob((0, pos), [Termination], 35mm, tint: gray, name: <end>),
+  pos += dy*1.1,
+  blob((0, pos), [$t >= t_"end"$ ?], tint: gray, name: <d2h>),
+  pos += dy,
+  blob((0, pos), [Termination], tint: gray, name: <end>),
 
-  edge(<h2d>, <if>, "-|>"),
-  edge(<flux>, (0., 2.85), "-|>"),
   edge(<update>, <buf>, "-|>"),
-  edge(<min>, (0, 7.65), "-|>"),
-  edge(<if>, (0, .8+.45), "-|>", label: [no], label-side: left),
-  edge(<if>, <yes>, "..|>", corner: left),
-  node((-0.5, -.25), align(center, [yes])),
-  //node((0.075, .5), align(center, [no])),
+  edge(<if>, <yes>, "..|>", corner: left, label: "yes", label-pos:.25),
 
-  edge((-1.46, .5 + .2), (-1.47, 1.1 + .2), "<|-", bend: -120deg, label: [no]),
-  let shift = 1.25,
-  edge((.405, 3.15 + shift), (.415, 3.75 + shift), "<|-", bend: 120deg, label: [no]),
-
-  edge(<d2h>,"r,uuuuuuuuuu,l","--|>"),
+  edge(<d2h>, "r", (rel: (0, -9.25)), "l","--|>", label: "no", label-pos: .175, label-side: right),
   edge(<red>, <d2h>, "-|>", label: [$t = t + sigma Delta t$], label-side: left),
 
-  edge(<buf>, (0, 5.85), "-|>", label: [yes], label-side: left),
-  edge(<d2h>, <end>, "-|>"),
+  edge(<d2h>, <end>, "-|>", label: "yes", label-side: left),
 
   let off = .4,
-  edge((-.8, 3.5 + off), (-.8, 4 + off), "-"),
-  edge((-.8, 4 + off), (-.8, 4.5 + off), "--")
- 
-), caption: [Updated program structure of the parallel implementation]) <hydroflow_parallel>
+  edge(<write.south>, (output_dx, 4.5 + off), "-"),
+  edge((output_dx, 4.5 + off), (output_dx, 5 + off), "--")
+)), caption: [Updated program structure of the parallel implementation]) <hydroflow_parallel>
 
 A subtlety remains in the program structure shown in @hydroflow and @hydroflow_parallel. The sum in @update is not performed while iterating over cells. Instead, each cell is linked to a buffer, reinitialized at each time step, where fluxes computed at each interface accumulate#footnote[Actually, multiplied by constants reflecting coordinate transforms and scaled by interface lengths] during the first step of flux computation. This requires each interface to store references to its left and right cells, unless it lies on the boundary. In the update step, the flux sum is retrieved from the buffer as a constant and combined with source term contributions. A diagram of this interface-based approach appears in @interf_based.
 
@@ -198,15 +216,19 @@ In contrast, a cell-based approach as in @cell_based may feel more intuitive giv
 
 #import "@preview/subpar:0.2.2"
 #subpar.grid(
-  figure(image("../img/edge_based.svg"), caption: [
+  figure(image("../img/edge_based.svg", width: 70%), gap: .75em, caption: [
     Interface-based approach
   ]), <interf_based>,
-  figure(image("../img/cell_based.svg"), caption: [
+  figure(image("../img/cell_based.svg", width: 70%), gap: .75em, caption: [
     Cell-based approach
   ]), <cell_based>,
   columns: (1fr, 1fr),
   caption: [Memory accesses of flux balances],
   label: <memory_fluxes>,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )
 
 The main caveat of the interface-based approach is the greater difficulty in parallelizing it. While interfaces are processed in parallel by multiple threads, two threads may attempt to access the same cell at the same time, potentially causing a race condition. To avoid this, cell buffers must be protected with mutexes, ensuring only one thread modifies them at a time. This adds some serialization overhead, but it remains low, as the typically large number of interfaces spread across threads makes simultaneous access to the same cell unlikely.

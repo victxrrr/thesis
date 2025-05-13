@@ -4,7 +4,7 @@ As introduced in the state of the art, Graphics Processing Units were originally
   box(
     image("../img/drawing.svg", width: 75%),
     clip: true,
-    inset: (bottom: -12.5mm, top: -3mm))
+    inset: (bottom: -10.5mm, top: -3mm))
     ,
   caption: [Insight behind Watlab's GPU implementation ]
 ) <drawing>

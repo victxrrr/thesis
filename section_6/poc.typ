@@ -36,15 +36,17 @@ In the PoC, only the water height variable and interface fluxes remain. Starting
 	mark-scale: 70%,
   debug: 0,
 
-  blob((0, -0.25), [*Data transfer* \ Host $arrow$ Device], 40mm, tint: gray, name: <h2d>),
+  let w = 35mm,
 
-  blob((0, 1.25), [*Flux kernel* \ $F = (h_L + h_R)/2$], 40mm, tint: blue, name: <flux>),
+  blob((0, -0.25), [*Data transfer* \ Host $arrow$ Device], w, tint: gray, name: <h2d>),
 
-  blob((0, 2.75), [*Update kernel* \ $h = h + 2 dot 10^(-6)$], 40mm, tint: green, name: <update>),
+  blob((0, 1.25), [*Flux kernel* \ $F = (h_L + h_R)/2$], w, tint: blue, name: <flux>),
 
-  blob((0, 4.25), [*Min reduction* \ $h_"min" = min_i h_i$], 40mm, tint: red, name: <min>),
+  blob((0, 2.75), [*Update kernel* \ $h = h + 2 dot 10^(-6)$], w, tint: green, name: <update>),
 
-  blob((0, 5.75), [*Data transfer* \ Device $arrow$ Host], 40mm, tint: gray, name: <d2h>),
+  blob((0, 4.25), [*Min reduction* \ $h_"min" = min_i h_i$], w, tint: red, name: <min>),
+
+  blob((0, 5.75), [*Data transfer* \ Device $arrow$ Host], w, tint: gray, name: <d2h>),
 
   edge(<h2d>, <flux>, "-|>"),
   edge(<flux>, <update>, "-|>"),
@@ -54,7 +56,7 @@ In the PoC, only the water height variable and interface fluxes remain. Starting
   edge(<min>,"rr,uuu,ll", "--|>"),
   node((2.75, 2.75), align(center, [for $T$ steps]))
 
-), dx:12%), caption: [_Proof of Concept_ operating diagram], gap: 5mm)<poc>
+), dx:0%), caption: [_Proof of Concept_ operating diagram], gap: 5mm)<poc>
 
 For the final step, the reduction must be performed in parallel with optimal local memory usage. To achieve this, we use built-in reduction algorithms when available, ensuring they meet these requirements.
 

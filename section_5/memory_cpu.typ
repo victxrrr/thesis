@@ -28,27 +28,35 @@ After reordering the cells, we lose this benefit: the new indices disrupt the or
 The obtained timings are reported in REF.
 
 #subpar.grid(
-  figure(image("../img/no_RCM.svg"), caption: [
+  figure(image("../img/no_RCM.svg", width: 81%), gap: .75em, caption: [
     Before reordering
   ]), <square_mesh>,
-  figure(image("../img/RCM.svg"), caption: [
+  figure(image("../img/RCM.svg", width: 81%), gap: .75em, caption: [
     After reordering
   ]), <after_reordering>,
   columns: 1,
   caption: [A simple square mesh with 26 cells and 45 interfaces],
-  placement: auto
+  placement: auto,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )
 
 #subpar.grid(
-  figure(move(image("../img/adj_RCM.svg", width: 92.5%), dx:6%), caption: [
+  figure(move(image("../img/adj_RCM.svg", width: 77%), dx:6%), gap: .75em, caption: [
     Renumbering cells using the reverse Cuthill-McKee algorithm
   ]), <adj_v1>,
-  figure(move(image("../img/adj_RCM_QS.svg", width: 92.5%), dx: 6%), caption: [
+  figure(move(image("../img/adj_RCM_QS.svg", width: 77%), dx: 6%), gap: .75em, caption: [
     Renumbering cells using the reverse Cuthill-McKee algorithm and interfaces using Quicksort
   ]), <adj_v2>,
   columns: 1,
   caption: [Adjacency matrices related to the square mesh],
-  placement: auto
+  placement: auto,
+  numbering: n => {
+    let h1 = counter(heading).get().first()
+    numbering("1.1", h1, n)
+  }, gap: 1em
 )
 
 

@@ -4,9 +4,18 @@ The scheduler chooses a block size proportional to $max(#raw("block_size"), #raw
 
 A diagram summarizing the different strategies for 4 threads is shown in @policies.
 
+#let scale_width(canvas) = {
+  context {
+    let canvas-size = measure(canvas)
+    layout(size => {
+      scale(size.width/canvas-size.width * 100%, canvas)
+    })  
+  }
+}
+
 #import "@preview/fletcher:0.5.2" as fletcher: diagram, node, edge
 #figure(
-  scale( 90%, 
+  scale_width( 
   diagram(
 	spacing: 8pt,
 	cell-size: (8mm, 10mm),
