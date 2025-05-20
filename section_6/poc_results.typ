@@ -70,7 +70,7 @@ Execution times are measured over 100 runs, discarding the first ten to avoid wa
   table.header(
     [Framework],
     [Duration [#unit[s]]],
-    [Speedup vs serial],
+    [$"Speedup"_"serial"$],
   ),
   [Serial], [$56.18 thick (plus.minus 0.29)$], [1],
   [OpenMP (20 threads)], [$3.31 thick (plus.minus 0.19)$], [16.95],

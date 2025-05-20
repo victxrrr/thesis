@@ -58,7 +58,7 @@
 // #print-glossary(
 //  entry-list, show-all: true
 // )
-// 
+//
 
 // #show: main-matter
 
@@ -87,7 +87,7 @@
 //   suboutline(fill: repeat(gap: 0.5em)[.])
 //   line(length: 100%)
 // }
-// 
+//
 #let minioutline() = {
   line(length: 100%)
   v(1%)
@@ -97,8 +97,8 @@
 
 = Introduction
 
-hook 
-problématique 
+hook
+problématique
 exemple parlant de pq on doit accelere
 
 #pagebreak()
@@ -151,9 +151,9 @@ exemple parlant de pq on doit accelere
 
 #include "section_4/toce.typ"
 
-== Theux
+== A square basin
 
-#include "section_4/theux.typ"
+#include "section_4/basin.typ"
 
 #pagebreak()
 = Implementations on CPU
@@ -179,7 +179,7 @@ exemple parlant de pq on doit accelere
 
 == Memory <memory_section>
 
-#include "section_5/memory_cpu.typ" 
+#include "section_5/memory_cpu.typ"
 
 == Benchmarks
 
@@ -240,7 +240,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_6/sync.typ"
 
-=== Benchmarks 
+=== Benchmarks
 
 #include "section_6/bench.typ"
 
@@ -254,6 +254,5 @@ exemple parlant de pq on doit accelere
 = Acknowledgements
 
 // #show: back-matter
-
 #pagebreak()
 #bibliography("ref.bib", full:false)

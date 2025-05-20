@@ -157,7 +157,7 @@ We tested these strategies on the same test case as above to evaluate their effe
   table.header(
     [Reordering],
     [Duration [#unit[s]]],
-    [Speedup vs serial],
+    [$"Speedup"_"serial"$],
   ),
   [RCM + Sort], [$1.84 thick (plus.minus 0.04)$], [30.52],
   [RCM + Sort with boundary variant], [$1.84 thick (plus.minus 0.04)$], [30.54],
