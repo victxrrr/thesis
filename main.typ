@@ -4,90 +4,121 @@
 #show: template.with(author: "Victor Lepère")
 
 // #set page(numbering: none)
-// #show: front-matter
+#show: front-matter
 
-#counter(page).update(n => n + 0)
-
-#set text(11pt, lang: "en")
-#set align(left)
-//#set page(numbering: "— 1 —")
-#set page(numbering: "1")
-#set heading(numbering: "1.1.1")
 #set par(
   first-line-indent: 1em,
   justify: true,
 )
-#set figure.caption(separator: " - ")
-#set figure(gap: 5mm)
-//#set math.equation(numbering: it => emph[#numbering("(i)", it)])
-// #let numbered_eq(content) = math.equation(
-//     block: true,
-//     numbering: it => emph[#numbering("(i)", it)],
-//     content,
-// )
-
-//#set figure(numbering: it => emph[#numbering("(i)", it)])
-
-#set math.equation(numbering: "(1)")
-
-#import "@preview/fancy-units:0.1.1": unit
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
 #outline()
-#pagebreak()
+// #pagebreak()
 #outline(title: "Figures", target: figure.where(kind: image))
 
 #outline(title: "Tables", target: figure.where(kind: table))
 
-#pagebreak()
+= Abbreviations
 
+#align(center)[
+#grid(
+  columns: (15%, 60%),
+  align(left)[#set text(weight: "regular")
+    #set par(leading: 1em)
+    SWE \
+    HLLC \
+    CFL \
+    GPU \
+    CPU \
+    OpenMP \
+    API \
+    MPI \
+    SM \
+    SIMT \
+    GPGPU \
+    CUDA \
+    AMD \
+    HIP \
+    OpenCL \
+    OpenACC \
+    HPC \
+    LUMI \
+    SYCL \
+    FPGA \
+    NPU \
+    DPC++ \
+    OpenGL \
+  ],
+  align(left)[#set par(leading: 1em)
+    Shallow water equations \
+    Harten-Lax-van Leer-Contact \
+    Courant-Friedrichs-Lewy \
+    Graphics Processing Unit \
+    Central Processing Unit \
+    Open Multi-Processing \
+    Application Programming Interface \
+    Message Passing Interface \
+    Streaming Multiprocessor \
+    Single Instruction, Multiple Threads \
+    General-Purpose computing on GPUs \
+    Compute Unified Device Architecture \
+    Advanced Micro Devices \
+    Heterogeneous-computing Interface for Portability \
+    Open Computing Language \
+    Open Accelerators \
+    High Performance Computing \
+    Large Unified Modern Infrastructure \
+    SYstem-wide Compute Language \
+    Field-Programmable Gate Array \
+    Neural Processing Unit \
+    Data Parallel C++ \
+    Open Graphics Library \
+  ]
+)
+]
+
+// #pagebreak()
+/*
 #show: make-glossary
 #let entry-list = (
   (
-    key: "kul",
-    short: "KUL",
-    long: "Katholieke Universiteit Leuven",
-    description: "A university in Belgium.",
+    key: "gpu",
+    short: "GPU",
+    long: "Graphic Processing Units",
+    // description: "A university in Belgium.",
   ),
-  // Add more terms
+   (
+    key: "cpu",
+    short: "GPU",
+    long: "Graphic Processing Units",
+    // description: "A university in Belgium.",
+  ),
+   (
+    key: "jpu",
+    short: "GPU",
+    long: "Graphic Processing Units",
+    // description: "A university in Belgium.",
+  ),
+   (
+    key: "kpu",
+    short: "GPU",
+    long: "Graphic Processing Units",
+    // description: "A university in Belgium.",
+  )
 )
 #register-glossary(entry-list)
 
-// #print-glossary(
-//  entry-list, show-all: true
-// )
-//
+bitches
+#print-glossary(
+ entry-list, show-all: true
+)
+*/
 
-// #show: main-matter
+#show: main-matter
 
 #import "@preview/suboutline:0.3.0": suboutline
-// #show heading: set text(11pt, weight: "regular")
-// #show heading.where(level: 1): it => {
-//   {
-//     set align(right)
-//     set par(spacing: 5mm)
-//     let number = counter(heading.where(level: 1)).display()
-//     text(90pt, rgb("#cd5454"), strong(number))
-//     parbreak()
-//     text(20pt, it.body)
-//   }
-//   line(length: 100%)
-//   show outline.entry: it => {
-//     let body = {
-//       box(stroke: red, outset: 1pt)[#it.prefix()#h(1.5em)#it.body()]
-//       h(4mm)
-//       box(width: 1fr, it.fill)
-//       h(7mm)
-//       it.page()
-//     }
-//     pad(left: 1.5cm, right: 1cm, link(it.element.location(), body))
-//   }
-//   suboutline(fill: repeat(gap: 0.5em)[.])
-//   line(length: 100%)
-// }
-//
 #let minioutline() = {
   line(length: 100%)
   v(1%)
@@ -95,13 +126,15 @@
   line(length: 100%)
 }
 
+#show: main-matter
 = Introduction
+
 
 hook
 problématique
 exemple parlant de pq on doit accelere
-
-#pagebreak()
+// I love @gpu @cpu @jpu @kpu
+// #pagebreak()
 = Governing equations <ch2>
 #minioutline()
 
@@ -121,7 +154,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_2/program_struct.typ"
 
-#pagebreak()
+// #pagebreak()
 = State of the art
 #minioutline()
 
@@ -141,7 +174,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_3/trends_swe.typ"
 
-#pagebreak()
+// #pagebreak()
 = Case studies
 #minioutline()
 
@@ -155,13 +188,13 @@ exemple parlant de pq on doit accelere
 
 #include "section_4/basin.typ"
 
-#pagebreak()
+// #pagebreak()
 = Implementations on CPU
 #minioutline()
 
 #include "section_5/intro.typ"
 
-== Profiling of Toce case study
+== Toce river: Profiling
 
 #include "section_5/prof.typ"
 
@@ -244,15 +277,15 @@ exemple parlant de pq on doit accelere
 
 #include "section_6/bench.typ"
 
-#pagebreak()
+// #pagebreak()
 = Perspectives
 
-#pagebreak()
+// #pagebreak()
 = Conclusion
 
-#pagebreak()
+// #pagebreak()
 = Acknowledgements
 
-// #show: back-matter
-#pagebreak()
+#show: back-matter
+// #pagebreak()
 #bibliography("ref.bib", full:false)

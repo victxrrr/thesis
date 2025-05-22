@@ -9,7 +9,7 @@ Abstraction libraries such as Kokkos, Alpaka, and SYCL allow writing code that i
 // CUDA
 cudaMalloc((void **) &d_cells, N * sizeof(Cell));
 cudaMemcpy(d_cells, h_cells, N * sizeof(Cell), cudaMemcpyHostToDevice);
-// Kokkos 
+// Kokkos
 Kokkos::View<Cell*, Kokkos::HostSpace> h_cells(data, N);
 Kokkos::View<Cell*> d_cells("cells", N);
 Kokkos::deep_copy(d_cells, h_cells);
@@ -47,8 +47,8 @@ Another interesting feature of abstraction libraries shown by the above pseudoco
 
 As in the Watlab implementation, the PoC includes a minimum reduction to compute the minimum water height in the domain. The need for an efficient parallel reduction algorithm is even more critical than in the CPU implementation given the high number of threads that must communicate. Furthermore, due to the high latency of global memory, intrablock communication should be preferred through shared memory when possible. To achieve a backend independent parallel implementation that meets this requirement, we rely on built in optimized algorithms provided by the libraries, which handle technical details and ease the programmer's work. This choice aligns with the PoC objectives stated at the beginning of the section.
 
-For this reason, Alpaka remains less attractive as it does not provide such reductions, unlike CUDA, Kokkos, or AdaptiveCpp. To effectively compare the remaining candidates, we considered the following test case. We used the Toce _XL_ geometry as input to create sufficient computational load so that the benefits of GPU offloading could be clearly observed. Water heights were initialized with pseudorandom values between 0 and 1 according to a user defined seed. The rest of the execution follows the chart shown in @poc and we simulated $T=1000$ steps. Only the execution of this part was recorded. 
-//No measurements were performed for Alpaka as this would lead to unfair comparisons since the reduction kernel is skipped and could confuse the reader. 
+For this reason, Alpaka remains less attractive as it does not provide such reductions, unlike CUDA, Kokkos, or AdaptiveCpp. To effectively compare the remaining candidates, we considered the following test case. We used the Toce _XL_ geometry as input to create sufficient computational load so that the benefits of GPU offloading could be clearly observed. Water heights were initialized with pseudorandom values between 0 and 1 according to a user defined seed. The rest of the execution follows the chart shown in @poc and we simulated $T=1000$ steps. Only the execution of this part was recorded.
+//No measurements were performed for Alpaka as this would lead to unfair comparisons since the reduction kernel is skipped and could confuse the reader.
 The measurements for the different implementations are listed in @poc_times.
 Execution times are measured over 100 runs, discarding the first ten to avoid warm up effects.
 
@@ -80,45 +80,45 @@ Execution times are measured over 100 runs, discarding the first ten to avoid wa
 ), caption: [Timings of the PoC on Toce _XL_ over 1000 steps])
 <poc_times>
 
-We observe that the speedups achieved with the GPU implementations are significant and greater than those of the OpenMP parallel version. The results are quite similar among the GPU implementations. We would also expect the CUDA implementation to yield the lowest mean execution times as it does not introduce abstraction overhead. 
+We observe that the speedups achieved with the GPU implementations are significant and greater than those of the OpenMP parallel version. The results are quite similar among the GPU implementations. We would also expect the CUDA implementation to yield the lowest mean execution times as it does not introduce abstraction overhead.
 The slightly larger execution time of the AdaptiveCpp implementation mainly results from the initialization of the queue.
-The point is that, as CPU and GPU are different hardware that execute independently, CPU based timings like those presented may not be accurate given the asynchronous nature of the program. 
+The point is that, as CPU and GPU are different hardware that execute independently, CPU based timings like those presented may not be accurate given the asynchronous nature of the program.
 A more reliable way to compare them is to use GPU specific profiling tools such as NVIDIA Nsight Compute, which is part of the CUDA toolkit and allows to perform kernel profiling. The results are shown in @ncu.
 
 #import "@preview/subpar:0.2.2"
 
 #subpar.grid(
   figure(table(
-      columns: (16%, 21%, 31.5%, 31.5%),
+      columns: (1fr,1fr,1fr,1fr),
       table.header(
         [Framework],
-        [Duration [#unit[ms]]],
-        [Compute Throughput [#unit[%]]],
-        [Memory Throughput [#unit[%]]],
+        [Duration #unit[[ms]]],
+        [Compute \ Throughput #unit[[%]]],
+        [Memory \ Throughput #unit[[%]]],
       ),
       [CUDA], [$1.38 thick (plus.minus 0.004)$], [$2.8 thick (plus.minus 0.009)$], [$47.758 thick (plus.minus 0.123)$],
       [Kokkos], [$1.384 thick (plus.minus 0.005)$], [$2.796 thick (plus.minus 0.008)$], [$47.596 thick (plus.minus 0.140)$],
       [AdaptiveCpp], [$1.38 thick (plus.minus 0.005)$], [$2.799 thick (plus.minus 0.009)$], [$47.757 thick (plus.minus 0.140)$],
     ), gap: .75em, caption: [Flux kernel]),
   figure(table(
-    columns: (16%, 21%, 31.5%, 31.5%),
+    columns: (1fr,1fr,1fr,1fr),
     table.header(
       [Framework],
-      [Duration [#unit[ms]]],
-      [Compute Throughput [#unit[%]]],
-      [Memory Throughput [#unit[%]]],
+      [Duration #unit[[ms]]],
+      [Compute \ Throughput #unit[[%]]],
+      [Memory \ Throughput #unit[[%]]],
     ),
     [CUDA], [$0.29 thick (plus.minus 0.004)$], [$4.522 thick (plus.minus 0.058)$], [$86.744 thick (plus.minus 0.408)$],
     [Kokkos], [$0.293 thick (plus.minus 0.005)$], [$4.46 thick (plus.minus 0.029)$], [$85.448 thick (plus.minus 0.466)$],
     [AdaptiveCpp], [$0.291 thick (plus.minus 0.004)$], [$4.515 thick (plus.minus 0.058)$], [$86.578 thick (plus.minus 0.516)$],
   ), gap: .75em, caption: [Update kernel]),
   figure(table(
-    columns: (16%, 21%, 31.5%, 31.5%),
+    columns: (1fr,1fr,1fr,1fr),
     table.header(
       [Framework],
-      [Duration [#unit[ms]]],
-      [Compute Throughput [#unit[%]]],
-      [Memory Throughput [#unit[%]]],
+      [Duration #unit[[ms]]],
+      [Compute \ Throughput #unit[[%]]],
+      [Memory \ Throughput #unit[[%]]],
     ),
     [CUDA], [$0.15 thick (plus.minus 0.000)$], [$14.18 thick (plus.minus 0.067)$], [$97.57 thick (plus.minus 0.364)$],
     [Kokkos], [$0.151 thick (plus.minus 0.003)$], [$12.434 thick (plus.minus 0.044)$], [$91.054 thick (plus.minus 0.290)$],
@@ -135,5 +135,5 @@ A more reliable way to compare them is to use GPU specific profiling tools such 
 )
 This analysis shows that abstraction libraries are competitive with naive CUDA code while offering simplicity and portability. Furthermore, the low compute throughput shows that this PoC is an example of a memory bound algorithm. Between the two libraries we will choose AdaptiveCpp because its generic compiler feature allows the use of a single binary while maintaining competitive performance.
 
-Naturally, the Just-In-Time (JIT) mechanism introduces a small overhead. However, the authors of @SSCP report that it is of the same order of magnitude as the cost of the compilation step from IR to machine code already performed by backend drivers in current SYCL implementations. Only the first run of the program involves this JIT mechanism when a kernel execution is requested. Kernels are then cached as executable objects so that following runs do not need to retranslate them for the target architecture. To measure it precisely, we rebuilt the SYCL executable 100 times to discard cached kernels and executed it after the CUDA version to isolate the JIT overhead from GPU initialization, which also occurs during the first run of a GPU enabled program (for example, setting up drivers). The obtained mean execution time is $2.49 thick (plus.minus 0.05)$ seconds, giving an average overhead of 
+Naturally, the Just-In-Time (JIT) mechanism introduces a small overhead. However, the authors of @SSCP report that it is of the same order of magnitude as the cost of the compilation step from IR to machine code already performed by backend drivers in current SYCL implementations. Only the first run of the program involves this JIT mechanism when a kernel execution is requested. Kernels are then cached as executable objects so that following runs do not need to retranslate them for the target architecture. To measure it precisely, we rebuilt the SYCL executable 100 times to discard cached kernels and executed it after the CUDA version to isolate the JIT overhead from GPU initialization, which also occurs during the first run of a GPU enabled program (for example, setting up drivers). The obtained mean execution time is $2.49 thick (plus.minus 0.05)$ seconds, giving an average overhead of
 $0.42$ seconds. Note that the overhead is independent of the test case size and depends only on the number of instructions and the complexity of the kernels.

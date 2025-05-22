@@ -13,7 +13,7 @@ To prevent confusion, we first provide a high-level overview of the program arch
 
 Watlab is publicly available @Watlab as a Python package and can be easily installed via `pip` @pip. When downloaded, only the Python files and compiled binaries are installed on the user's machine.
 
-Our work primarily focuses on the computational code written in C++, though we may also modify the Python module if, for example, mesh reorganization is needed. A summary diagram of the high-level architecture is shown in @high. 
+Our work primarily focuses on the computational code written in C++, though we may also modify the Python module if, for example, mesh reorganization is needed. A summary diagram of the high-level architecture is shown in @high.
 Also note that the C++ code may sometimes be referred as _Hydroflow_.
 
 #let blob(pos, label, tint: white, ..args) = node(
@@ -40,7 +40,7 @@ Also note that the C++ code may sometimes be referred as _Hydroflow_.
       blob((0, 1.5), [*Binary*], width: 25mm, tint: gray, name: <binary>),
       edge("-|>"),
       node((0, 3), align(center, [Output files]), name: <output>),
-      
+
       node((.5, .725), align(center, [Input files])),
 
       blob((-3.5, 1.5), [*Hydroflow* \ C++ source], width: 25mm, tint: gray, name: <hydroflow>),
@@ -57,10 +57,6 @@ Also note that the C++ code may sometimes be referred as _Hydroflow_.
   ),
   caption:  [High-level architecture]
 )<high>
-
-We now focus on the structure of the computational code, including the implementation of the finite volume scheme. The program begins by reading the provided geometry and instantiating objects representing the domain, cells, interfaces, and nodes. It then enters the main loop. \
-At each iteration, the program first checks whether hydraulic variables need to be output. Watlab provides several data outputs, including hydraulic variables at user-specified gauges, the maximum water height in the domain, snapshots of hydraulic variables in each cell (_pictures_), and total discharge across interface sections. If output is required, it is processed first; otherwise, the domain is updated.\
-The update process involves computing numerical fluxes at each interface, calculating source terms for each cell, and updating hydraulic quantities based on the FV scheme (@update). The computational dependencies between variables over time are illustrated in @dep. The next time step is then determined using the CFL condition (@CFL). This corresponds to the theoretically maximum stable time step. In practice, it is rescaled using the user-provided CFL number $0 < sigma <= 1$ to enhance stability. If the updated simulation time exceeds the end time, the program terminates and cleans up the data. Otherwise, the time step is incremented, and the loop continues. An overview of the program structure is provided in @hydroflow.
 
 #figure(placement: auto,
   cetz.canvas({
@@ -81,7 +77,7 @@ The update process involves computing numerical fluxes at each interface, calcul
   content((0, 6.75), $t$)
   line((0,8, 0), (0,8, -1), mark: (end: "stealth", fill: black, scale: .75))
   content((0, 8, -1.35), $y$)
-  
+
   line((1,7), (4, 7, -4), stroke: luma(70%))
   line((1,7), (9,7), stroke: luma(70%))
   line((9,7), (4,7,-4), stroke: luma(70%))
@@ -148,7 +144,6 @@ The update process involves computing numerical fluxes at each interface, calcul
   //sq((7.25, 7.33), light_clr3)
   circle((3.25 + dx, 7.33, 0), fill: light_clr2, stroke: light_clr2, radius: 2pt)
   //sq((3.25, 7.33), light_clr3)
-  
 
   circle((5.5, 5, 0), fill: clr1, stroke: clr1, radius: 2pt)
   circle((4.25, 4.5, 0), fill: clr1, stroke: clr1, radius: 2pt)
@@ -207,7 +202,10 @@ The update process involves computing numerical fluxes at each interface, calcul
   caption: [Dependencies]
 )<dep>
 
-#figure(placement: auto,
+We now focus on the structure of the computational code, including the implementation of the finite volume scheme. The program begins by reading the provided geometry and instantiating objects representing the domain, cells, interfaces, and nodes. It then enters the main loop. \
+At each iteration, the program first checks whether hydraulic variables need to be output. Watlab provides several data outputs, including hydraulic variables at user-specified gauges, the maximum water height in the domain (_enveloppes_), snapshots of hydraulic variables in each cell (_pictures_), and total discharge across interface sections. If output is required, it is processed first; otherwise, the domain is updated.
+
+#figure(placement: none,
   diagram(
 	spacing: 8pt,
 	cell-size: (8mm, 10mm),
@@ -254,3 +252,5 @@ The update process involves computing numerical fluxes at each interface, calcul
   ),
   caption: [Program structure]
 )<hydroflow>
+
+The update process involves computing numerical fluxes at each interface, calculating source terms for each cell, and updating hydraulic quantities based on the finite-volume scheme (@update). The computational dependencies between variables over time are illustrated in @dep. The next time step is then determined using the CFL condition (@CFL). This corresponds to the theoretically maximum stable time step. In practice, it is rescaled using the user-provided CFL number $0 < sigma <= 1$ to enhance stability. If the updated simulation time exceeds the end time, the program terminates and cleans up the data. Otherwise, the time step is incremented, and the loop continues. An overview of the program structure is provided in @hydroflow.

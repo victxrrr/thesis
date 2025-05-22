@@ -27,7 +27,7 @@ long } }
   set heading(numbering: "1.1")
   show heading.where(level: 1): it => {
     it
-    v(12%, weak: true)
+    v(0%, weak: true)
   }
   body
 }
@@ -68,7 +68,7 @@ long } }
   )
 
   // Set the body font.
-  //set text(font: ("Utopia LaTeX"), size: 11pt)
+  set text(font: "Utopia LaTeX", size: 11pt) // falling back to Libertinus Serif
 
   // Configure page size and margins.
   set page(
@@ -219,8 +219,11 @@ long } }
   set figure(numbering: n => {
     let h1 = counter(heading).get().first()
     numbering("1.1", h1, n)
-  }, gap: 1.5em)
+    },
+    placement: auto,
+    gap: 1.5em) // gap: 1.5em)
   set figure.caption(separator: [ -- ])
+  set scale(reflow: true) // ensure rescale change figure layout
 
   show figure.caption: it =>{
     if it.kind == table {
@@ -240,7 +243,7 @@ long } }
 
   // Set raw text font.
   //show raw: set text(font: ("Iosevka", "Fira Mono"), size: 10pt)
-  show raw: set text(font: "Ubuntu Mono", size: 9.5pt)
+  show raw: set text(font: "Ubuntu Mono", size: 10pt)
   // show raw: set text(size: 10pt)
 
 

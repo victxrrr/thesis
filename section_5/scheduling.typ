@@ -1,4 +1,4 @@
-Concerning OpenMP loops, OpenMP provides several scheduling policies that can be passed to the compiler using the #raw("schedule(<policy>, <block_size>)") keyword in the directive. 
+Concerning OpenMP loops, OpenMP provides several scheduling policies that can be passed to the compiler using the #raw("schedule(<policy>, <block_size>)") keyword in the directive.
 Users can choose between `static`, `dynamic`, or `guided` scheduling policies. In static scheduling, loop iterations are split into contiguous blocks of roughly equal size at compile time and assigned to threads. The `block_size` argument can reduce block size and distribute them cyclically among threads. Dynamic scheduling assigns blocks at runtime, adding overhead. Threads receive a new block of size `block_size` as soon as they finish the previous one. If not specified, `block_size` defaults to 1. Guided scheduling is a dynamic strategy with decreasing block sizes.
 The scheduler chooses a block size proportional to $max(#raw("block_size"), #raw("unassigned_iterations / num_threads"))$.
 
@@ -9,13 +9,13 @@ A diagram summarizing the different strategies for 4 threads is shown in @polici
     let canvas-size = measure(canvas)
     layout(size => {
       scale(size.width/canvas-size.width * 100%, canvas)
-    })  
+    })
   }
 }
 
 #import "@preview/fletcher:0.5.2" as fletcher: diagram, node, edge
 #figure(
-  scale_width( 
+  scale_width(
   diagram(
 	spacing: 8pt,
 	cell-size: (8mm, 10mm),
@@ -76,7 +76,7 @@ A diagram summarizing the different strategies for 4 threads is shown in @polici
   node((5, y_text -1.5), [$T_2$]),
   node((9, y_text -1.5), [$T_3$]),
   node((13, y_text -1.5), [$T_4$]),
- 
+
   node((0, y_text), [$T_1$]),
   node((2, y_text), [$T_2$]),
   node((4, y_text), [$T_3$]),
@@ -152,7 +152,10 @@ In Watlab, imbalance stems from the presence of dry and wet cells. No flux or so
 
 #figure(
   placement: auto,
-  image("../img/policies.svg"),
+  block(stroke: none, clip: true,
+    inset: (top:-7pt, bottom:-8pt, left:-8pt, right:-8pt),
+  image("../img/policies.svg")
+  ),
   caption: [Mean kernel execution time with each scheduling policy]
 )<kernel_policies>
 

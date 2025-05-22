@@ -19,7 +19,7 @@
 
 To solve @SWE, we divide the computational domain into smaller two-dimensional _cells_, denoted by $cal(C)_i$ (@cell), and assume the hydraulic variables in $bold(U)$ remain constant within each cell. The segments forming the boundaries are called _interfaces_, and the cells are typically triangular. Finally, the cell vertices are called _nodes_, and the collection of cells, interfaces, and nodes forms a _mesh_ used to solve the shallow water equations.
 
-#figure(placement: auto,
+#figure(placement: none,
   scale(75%,
   cetz.canvas(
     {
@@ -30,7 +30,7 @@ To solve @SWE, we divide the computational domain into smaller two-dimensional _
       //grid((-8,-5), (8,4), help-lines: true)
       // line((-8,0), (8,0))
       // line((0,-5), (0,4))
-      // 
+      //
 
       let up = (-4, -2)
       let length = 2
@@ -83,12 +83,29 @@ To solve @SWE, we divide the computational domain into smaller two-dimensional _
 
     }
   )),
-  caption: [Cell geometry
-  ]
+  caption: [Cell geometry]
 )<cell>
 
+The finite volume formulation follows from conservation laws imposed on the control volumes $Omega_i := cal(C)_i times Delta t$ (@control). Mathematically, this is expressed as:
+$
+  integral_(Omega_i) (
+    (partial bold(U))/(partial t) + (partial bold(F)(bold(U)))/(partial x) + (partial bold(G)(bold(U)))/(partial y)
+  ) d Omega
+  =
+  integral_(Omega_i)
+  bold(S)(bold(U)) d Omega
+$ <int>
+The left-hand side of @int represents the divergence of the vector
+$
+  bold(H) = vec(bold(F), bold(G), bold(U))
+$
+in the $(x, y, t)$ space. Applying the Green-Gauss theorem, we transform the volume integral into a surface integral:
+$
+  integral_(Omega_i) (nabla dot bold(H)) thin  d Omega = integral.cont_(partial Omega_i) ( bold(H) dot bold(n)) thin d S
+$
+where $bold(n)$ is the outward normal vector. To compute the integral, we sum the contributions from each face of the control volume.
 
-#figure(placement: auto,
+#figure(placement: none,
   scale(75%,
   cetz.canvas(
     {
@@ -99,7 +116,7 @@ To solve @SWE, we divide the computational domain into smaller two-dimensional _
       //grid((-5,-5), (10,4), help-lines: true)
       // line((-5,0), (10,0))
       // line((0,-5), (0,4))
-      // 
+      //
 
       let up = (-4, -1)
       let length = 2
@@ -146,24 +163,6 @@ To solve @SWE, we divide the computational domain into smaller two-dimensional _
   ]
 )<control>
 
-The finite volume formulation follows from conservation laws imposed on the control volumes $Omega_i := cal(C)_i times Delta t$ (@control). Mathematically, this is expressed as:
-$
-  integral_(Omega_i) (
-    (partial bold(U))/(partial t) + (partial bold(F)(bold(U)))/(partial x) + (partial bold(G)(bold(U)))/(partial y) 
-  ) d Omega
-  = 
-  integral_(Omega_i)
-  bold(S)(bold(U)) d Omega
-$ <int>
-The left-hand side of @int represents the divergence of the vector
-$
-  bold(H) = vec(bold(F), bold(G), bold(U))
-$
-in the $(x, y, t)$ space. Applying the Green-Gauss theorem, we transform the volume integral into a surface integral:
-$
-  integral_(Omega_i) (nabla dot bold(H)) thin  d Omega = integral.cont_(partial Omega_i) ( bold(H) dot bold(n)) thin d S
-$
-where $bold(n)$ is the outward normal vector. To compute the integral, we sum the contributions from each face of the control volume. \
 Since Watlab handles *unstructured* meshes, determining flux contributions at interfaces is nontrivial. We use a $*$ superscript for time-averaged quantities over $Delta t$ and denote the area of $cal(C)_i$ as $abs(cal(C)_i)$. Instead of directly computing $ bold(F)^*$ and $bold(G)^*$ at interfaces, we solve a locally equivalent problem using the basis transformation:
 
 $
@@ -179,7 +178,7 @@ $
 $
 Multiplying by $bold(T)^(-1)$ recovers the average flux across the interface in global coordinates, i.e. an appropriate weighted summation of vertical and horizontal flux contributions, yielding:
 $
-  integral.cont_(partial Omega_i) ( bold(H) dot bold(n)) thin d S 
+  integral.cont_(partial Omega_i) ( bold(H) dot bold(n)) thin d S
   = mat(bold(F), bold(G), bold(U))^(n+1)_i vec(0, 0, 1) abs(cal(C)_i) + mat(bold(F), bold(G), bold(U))^n_i vec(0, 0, -1) abs(cal(C)_i) \
   + Delta t sum_(j) bold(T)^(-1)_j bold(F)^*_j (overline(bold(U))_i^n) L_j
 $
@@ -199,8 +198,7 @@ Finally, as this scheme is explicit, the time step must be carefully chosen to e
 $
   Delta t^n = min_i ( (Delta x)/(abs(bold(u)^n) + c^n) )_i
 $<CFL>
-where   
-$ 
+where
+$
 Delta x_i = 2(abs(cal(C)_i)) / abs(partial cal(C)_i) wide abs(bold(u)^n_i) = sqrt((u_i^n)^2 + (v_i^n)^2) wide c_i^n = sqrt(g h_i^n )
 $
-

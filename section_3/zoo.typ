@@ -1,14 +1,14 @@
-At the time of the previous study @Gamba, the options for porting existing C++ code to a GPU-capable implementation were quite limited and often hardware-dependent. The most popular among them is the Compute Unified Device Architecture (CUDA) @CUDA, a proprietary framework developed by NVIDIA that supports only its GPUs. 
-As a strategic response, AMD developed HIP @HIP, a C++ runtime API that allows developers to write code compilable for both AMD and NVIDIA GPUs. Its syntax is intentionally close to CUDA#footnote[Mainly, replacing `cuda` prefixes with `hip`.] to ease code conversion#footnote[AMD also provides an automation tool called `hipify`.] from CUDA to HIP.
+At the time of the previous study @Gamba, the options for porting existing C++ code to a GPU-capable implementation were quite limited and often hardware-dependent. The most popular among them is the Compute Unified Device Architecture (CUDA) @CUDA, a proprietary framework developed by NVIDIA that supports only its GPUs.
+As a strategic response, AMD developed HIP @HIP, a C++ runtime API that allows developers to write code compilable for both AMD and NVIDIA GPUs. Its syntax is intentionally close to CUDA#footnote[Mainly, replacing `cuda` prefixes with `hip`.] to ease code conversion#footnote[AMD also provides an automation translation tool called `hipify`.] from CUDA to HIP.
 Originally, OpenCL @OpenCL was the primary method for GPGPU on AMD and Intel hardware. It is a cross-platform parallel programming standard compatible with various accelerators, including NVIDIA, AMD, and Intel GPUs. However, it is less popular in the scientific community due to limited performance portability @Henriksen and lower productivity, requiring more code to achieve the same results @Martineau.
 
 Additionally, the OpenACC @OpenACC programming standard uses directives for NVIDIA/AMD GPU offloading, making it the GPGPU equivalent of OpenMP. This approach is well-suited for inexperienced developers @Czarnul. More recently, OpenMP introduced GPU offloading via compiler macros, but its performance remains slower than OpenACC @Usha, @ZHANG.
 
 During the past decades, NVIDIA was the uncontested leader in the consumer GPU and HPC markets. Nowadays, AMD and Intel have become serious competitors @Wang. For example, many new HPC infrastructures use non-NVIDIA hardware, such as the European LUMI supercomputer with AMD Instinct GPUs @LUMI. Meanwhile, Intel has launched its Arc GPUs, increasingly featured in mainstream laptops.
 
-Facing increasing heterogeneity in computing platforms, the HPC community has developed high-level abstraction libraries such as Kokkos @Kokkos, RAJA @Raja, SYCL @Sycl, and Alpaka @Alpaka. These are built on traditional GPGPU languages like CUDA, HIP, and OpenCL, allowing users to avoid hardware-specific details by handling backend code within the libraries. This enables developers to write self-contained C++ programs, unlike CUDA and OpenCL, which separate host and device code. The key advantage is a single source file supporting multiple backend targets, including serial and OpenMP-based CPU versions, while ensuring minimal overhead and performance portability. Additionally, these implementations are future-proof, as maintainers can adapt the libraries to emerging hardware like FPGAs or DSPs without requiring major user code rewrites. Notably, Kokkos documentation indicates ongoing backend development.
+Facing increasing heterogeneity in computing platforms, the HPC community has developed high-level abstraction libraries such as Kokkos @Kokkos, RAJA @Raja, SYCL @Sycl, and Alpaka @Alpaka. These are built on traditional GPGPU languages like CUDA, HIP, and OpenCL, allowing users to avoid hardware-specific details by handling backend code within the libraries. This enables developers to write self-contained C++ programs, unlike CUDA and OpenCL, which separate host and device code. Indeed, since they extend the regular C++ language with new keywords, the kernel code must be embedded in `.cu` and `.cl` files, respectively. The key advantage brought by abstraction libraries is a single source file supporting multiple backend targets, including serial and OpenMP-based CPU versions, while ensuring minimal overhead and performance portability. Additionally, these implementations are future-proof, as maintainers can adapt the libraries to emerging hardware like Field-Programmable Gate Arrays (FPGAs) or Neural Processing Units (NPUs) without requiring major user code rewrites. Notably, Kokkos documentation indicates ongoing backend development.
 
-The latest SYCL standard, SYCL 2020 @SYCL2020, was developed by Khronos, the group behind OpenCL. Various implementations support SYCL 2020 specification to different extents, using different compilers and backends. Notable examples include DPC++ @DPCPP (Intel), ComputeCpp @ComputeCPP (Codeplay), triSYCL @triSYCL, AdaptiveCpp (formerly hipSYCL) @hipSYCL, and neoSYCL @neoSYCL, each targeting different hardware platforms. Note that SYCL can also serve as a backend for both Kokkos @KoSYCL and RAJA @RaSYCL.
+The latest SYCL standard, SYCL 2020 @SYCL2020, was developed by Khronos, the group behind OpenCL. The main difference from other libraries is that SYCL is merely a specification defining an API with expected behaviors, without providing an implementation. Various implementations support SYCL 2020 specification to different extents, using different compilers and backends. Notable examples include DPC++ @DPCPP (Intel), ComputeCpp @ComputeCPP (Codeplay), triSYCL @triSYCL, AdaptiveCpp (formerly hipSYCL) @hipSYCL, and neoSYCL @neoSYCL, each targeting different hardware platforms. Note that SYCL can also serve as a backend for both Kokkos @KoSYCL and RAJA @RaSYCL.
 
 A visual summary of the approaches discussed so far is presented in @Parallel.
 
@@ -33,7 +33,7 @@ A visual summary of the approaches discussed so far is presented in @Parallel.
 	..args,
 )
 
-#figure(placement: auto,
+#figure(placement: none,
 diagram(
 	spacing: 8pt,
 	cell-size: (8mm, 10mm),
@@ -81,17 +81,15 @@ diagram(
 
   large_blob((4.5, 2.25), [General Purpose \ Languages], tint: gray, name: <mem2>),
   edge(<gpu>, <mem2>, "-|>"),
-  
+
   large_blob((4.5, 4.75), [CUDA, HIP, OpenMP, OpenACC, OpenCL, ...], tint: blue, shape: hexagon, name: <cuda>),
   edge(<gpu>, <cuda>, "--|>"),
 
   edge(<cpu>, <gpu>, "<|..|>"),
   node((2.5, 1.25), align(center, [_data transfer_])),
-  
+
 
   // blob((4.5, 4), [CUDA], tint: blue, shape: diamond, name: <cuda>),
 ),
 caption: [Visual diagram of discussed approaches]
 ) <Parallel>
-
-

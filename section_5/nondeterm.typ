@@ -13,14 +13,14 @@ cause
 
 csq (tests + explosion erreur +  non reproductibilité)
 
-solutions ? 
+solutions ?
 
 calculer indexs locaux pour toujours faire les ops dans le meme ordre.
 
-- essai 1: cell based 
+- essai 1: cell based
 --> pourquoi est ce plus lent ?
 
-- essai 2: buffer de flux 
+- essai 2: buffer de flux
 */
 #import "@preview/fancy-units:0.1.1": qty
 
@@ -36,30 +36,29 @@ calculer indexs locaux pour toujours faire les ops dans le meme ordre.
   }
 }
 
-Real numbers are used in most scientific software. However, computers have finite memory to represent this infinite continuum. As a result, only a discrete subset can be stored, introducing round-off errors. The IEEE 754 @ieee754-2019 standard defines how floating point numbers are stored in hardware and specifies rounding rules for arithmetic operations. In particular, floating point operations must follow correct rounding: the result of an operation should be the exact value, whether representable or not, rounded to the nearest machine number. One consequence is that addition is not associative, especially when combining numbers of different magnitudes. The following Python example shows this.
+Real numbers are used in most scientific software. However, computers have finite memory to represent this infinite continuum. As a result, only a discrete subset can be stored, introducing round-off errors. The IEEE 754 @ieee754-2019 standard defines how floating point numbers are stored in hardware and specifies rounding rules for arithmetic operations. In particular, floating point operations must follow correct rounding, that is, the result of an operation should be the exact value, whether representable or not, rounded to the nearest machine number. One consequence is that addition is not associative, especially when combining numbers of different magnitudes. The following Python example shows this.
 ```python
 (1e20 + (-1e20)) + 3.14 # outputs 3.14
 1e20 + ((-1e20) + 3.14) # outputs 0.0
 ```
-
-A consequence of this rounding behavior is that multiple executions of a parallel program can produce different results if the order of arithmetic operations depends on scheduling. In our case, one unit test simulates Watlab on an artificial circular dam break with sediment transport. It considers a domain $Omega = [0, 5] times [0, 5]$, with a circular subregion $Omega_D = { (x, y) in Omega | (x - 5/2)^2 + (y - 5/2)^2 <= (3/4)^2 }$ representing a dam that suddenly breaks. The mathematical initial state of the hydraulic variables for this test case is as follows:
+A consequence of this rounding behavior is that multiple executions of a parallel program can produce different results if the order of arithmetic operations depends on scheduling decisions. In our case, one of our unit tests simulates Watlab on an artificial circular dam break with sediment transport. It considers a domain $Omega = [0, 5] times [0, 5]$, with a circular subregion $Omega_D = { (x, y) in Omega | (x - 5/2)^2 + (y - 5/2)^2 <= (3/4)^2 }$ representing a dam that suddenly breaks. The mathematical initial state of the hydraulic variables for this test case is as follows:
 $
   h^0 = cases(1 quad "if" (x,y) in Omega_D, 0 quad "if" (x,y) in Omega \\ Omega_D) wide h_s^0 = cases(0 quad "if" (x,y) in Omega_D, 1/5 quad "if" (x,y) in Omega \\ Omega_D)
 $
 with $h_s^n$ denoting the sediment level.
-The difference in water height along the radial direction simulates a dam break over a few seconds. The parallel version described earlier fails this test. Moreover, the differences between the expected and actual results vary across executions. To better understand the issue, we recorded snapshots every 
-$#qty[0.25][s]$ and compared them with the serial version. 
-Results are shown in @fig_nondeterm. 
-We observe that the differences are nondeterministic. 
-In addition, both the proportion of diverging elements and 
-the maximum relative error tend to increase over time. We also plotted the cells that show differences in water height at several time instants in .
+The difference in water height along the radial direction simulates a dam break over a few seconds. The parallel version described earlier fails this test. Moreover, the differences between the expected and actual results vary across executions. To better understand the issue, we recorded snapshots every
+$#qty[0.25][[s]]$ and compared them with the serial version.
+Results are shown in @fig_nondeterm.
+We observe that the differences are nondeterministic.
+In addition, both the proportion of diverging elements and
+the maximum relative error tend to increase over time.
 
 #import "@preview/subpar:0.2.2"
 #subpar.grid(
-  figure(image("../img/nnz_diff.svg"), caption: [
+  figure(box(image("../img/nnz_diff.svg"), clip:true, inset: (top:-10pt, bottom:-10pt, left: -10pt, right:-10pt), stroke: none), caption: [
     Evolution of diverging proportion
   ]), // <interf_based>,
-  figure(image("../img/rel_diff.svg"), caption: [
+  figure(box(image("../img/rel_diff.svg"), clip:true, inset: (top:-10pt, bottom:-10pt, left: -10pt, right:-10pt)), caption: [
     Evolution of maximum relative error
   ]),
   columns: (1fr, 1fr),
@@ -87,19 +86,19 @@ the maximum relative error tend to increase over time. We also plotted the cells
 //   label: <tri_div>,
 // )
 
-The only source of nondeterminism in the program comes from scheduling decisions. After carefully verifying that no race conditions occur, we found that the execution order of threads affects the order of flux balancing in the interface-based approach, which can alter the result. For example, consider @memory_fluxes, and in particular the cell with index 3. In the serial version, interfaces are processed in order, so the accumulation in the buffer results in 
+The only source of nondeterminism in the program comes from scheduling decisions. After carefully verifying that no race conditions occur, we found that the execution order of threads affects the order of flux balancing in the interface-based approach, which can alter the result. For example, consider @memory_fluxes, and in particular the cell with index 3. In the serial version, interfaces are processed in order, so the accumulation in the buffer results in
 $
-  sum_(j) bold(T)^(-1)_j bold(F)_j L_j 
+  sum_(j) bold(T)^(-1)_j bold(F)_j L_j
   = bold(T)^(-1)_3 bold(F)_3 L_3
   + bold(T)^(-1)_6 bold(F)_6 L_6
   + bold(T)^(-1)_7 bold(F)_7 L_7
 $
 Whereas in parallel, interfaces are processed without any guaranteed order, so we have no control over the sequence in which the boundaries of cell 3 are handled, which might be
-$ 
+$
     &bold(T)^(-1)_3 bold(F)_3 L_3
   + bold(T)^(-1)_6 bold(F)_6 L_6
   + bold(T)^(-1)_7 bold(F)_7 L_7 \
-  "or" wide 
+  "or" wide
     &bold(T)^(-1)_3 bold(F)_3 L_3
   + bold(T)^(-1)_7 bold(F)_7 L_7
   + bold(T)^(-1)_6 bold(F)_6 L_6 \
@@ -123,11 +122,10 @@ Note that we did not observe such nondeterministic behavior in the Toce simulati
 
 === First attempt
 
-To always get hydraulic values identical to the serial version, we just need to sum the fluxes in the same order, i.e. by increasing interface indices. This is not entirely trivial in the interface-based approach since a thread processing an interface cannot know if the previous ones have already been handled without expensive inter-thread communication. The simplest solution is to shift the summation to the finite-volume update step, adopting a cell-based approach. At this point, it suffices to retrieve the fluxes from the surrounding interfaces and accumulate their contributions in increasing order. As previously mentioned, the main caveat is the overhead from additional memory accesses. The performance of this implementation attempt is reported in REF.
-
-Another optimization concerns the logic for flux buffering. Interfaces do not always add fluxes to the buffers of the left and right cells. If both water heights are below a user-defined threshold representing zero depth, the hydraulic variables are preserved but not added. In the program, this is handled with if-else logic checking the water levels in both cells. When shifting flux balance to the cell update step, we would need to re-check these conditions before accumulating boundary interface fluxes. These checks would require extra memory accesses and increase overhead. Instead, we replace such fluxes with $+0$ since adding it leaves values unchanged in IEEE 754-compliant systems#footnote[More precisely, we have $x + (+0) = x$ for every floating point number $x$ except the negatively signed zero $-0$, for which $-0 + (+0) = +0$.]. 
+To always get hydraulic values identical to the serial version, we just need to sum the fluxes in the same order, i.e. by increasing interface indices. This is not entirely trivial in the interface-based approach since a thread processing an interface cannot know if the previous ones have already been handled without expensive inter-thread communication. The simplest solution is to shift the summation to the finite-volume update step, adopting a cell-based approach. At this point, it suffices to retrieve the fluxes from the surrounding interfaces and accumulate their contributions in increasing order. As previously mentioned, the main caveat is the overhead from additional memory accesses.
 Finally, note that this approach removes the need for mutexes.
 
 === Second attempt
 
-A better approach that maintains performance while ensuring determinism is to transform each cell's buffer into a vector of buffers. Each interface has precomputed local left and right indices that point to the appropriate position in the buffer vector where the fluxes should be stored, with $+0$ placed in the buffer if the cells are dry. In the update step, we simply accumulate the vector entries, avoiding any additional memory accesses outside the cell's buffer. This version is significantly faster, as shown in REF.
+A better approach that maintains performance while ensuring determinism is to transform each cell's buffer into a vector of buffers. Each interface has precomputed local left and right indices that point to the appropriate position in the buffer vector where the fluxes should be stored. In the update step, we simply accumulate the vector entries, avoiding any additional memory accesses outside the cell's buffer. Therefore, the number of uncached memory accesses is nearly the same as the interface-based implementation. \
+However, one detail remains. Interfaces do not always add fluxes to the left and right cell buffers. When both water heights are below the user-defined threshold representing zero depth, the hydraulic variables are preserved but not added. The program handles this with if-else logic that checks the water levels in both cells. When shifting the flux balance to the cell update step, these conditions needed to be rechecked before accumulating the boundary interface fluxes in the first version. These checks require extra memory access and increase overhead. In this second version, we filled the buffer with +0 in these cases, since adding +0 leaves values unchanged in IEEE 754-compliant systems#footnote[More precisely, we have $x + (+0) = x$ for every floating point number $x$ except the negatively signed zero $-0$, for which $-0 + (+0) = +0$.].

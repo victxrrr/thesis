@@ -1,4 +1,4 @@
-Modern Central Processing Units (CPUs) contain multiple processing cores, which are independent units that execute streams of instructions. Supercomputers, on the other hand, are machines with many CPUs that can work together on the same problem. Both types of parallel architectures rely on parallelism—the ability to break a computational task into smaller parts that can be executed independently and simultaneously. Because it occurs at multiple levels, parallelism is difficult to define precisely.
+Modern Central Processing Units (CPUs) contain multiple processing cores, which are independent units that execute streams of instructions. Supercomputers, on the other hand, are machines with many CPUs that can work together on the same problem. Both types of parallel architectures rely on parallelism, that is, the ability to break a computational task into smaller parts that can be executed independently and simultaneously. Because it occurs at multiple levels, parallelism is difficult to define precisely.
 
 To review the current parallelization methods, we will consider the more general abstraction of a parallel computer, which can be thought of as an architecture with multiple processors that allow multiple instruction sequences to be executed simultaneously. As the processors work together to solve a common problem, they need to access a common pool of data. \
 Parallel machines differ in how they tackle the problem of reconciling multiple memory accesses from multiple processors. According to the _distributed memory_ paradigm, each processor has its own address space, and no conflicting shared accesses can arise. In the _shared memory_ paradigm, all processors access a common address space. The existing programming models for taking advantage of parallel processors follow one of these paradigms, each of which involves a different set of constraints and capabilities.
@@ -6,12 +6,12 @@ Parallel machines differ in how they tackle the problem of reconciling multiple 
 Note that this section and the following are primarily based on the work of @Eijkhout.
 
 === Threads
-The building block of a parallel programming model implementing the shared memory paradigm is the thread. A thread is an execution context—that is, a set of register values that enables the CPU to execute a sequence of instructions. Each thread has its own stack for storing local variables and function calls, but it shares the heap of the parent process (i.e., an instance of a program) with other threads, and therefore shares global variables as well. \
-It is the operating system, through its scheduler, that decides which thread is executed, when, and on which processor. These scheduling decisions are often made at runtime and may vary from one execution to another @lee2016introduction. Therefore, if shared data is accessed concurrently by different threads, the final result may depend on which thread executes first—this is known as a race condition. To solve this problem, inter-thread synchronization is needed, typically through mechanisms such as mutexes, which allow only one thread to access a shared resource at a time while others wait. \
-Finally, threads are dynamic in the sense that they can be created during program execution.
+The building block of a parallel programming model implementing the shared memory paradigm is the thread. A thread is an execution context, i.e. a set of register values that enables the CPU to execute a sequence of instructions. Each thread has its own stack for storing local variables and function calls, but it shares the heap of the parent process (i.e., an instance of a program) with other threads, and therefore shares global variables as well. \
+It is the operating system, through its scheduler, that decides which thread is executed, when, and on which processor. These scheduling decisions are often made at runtime and may vary from one execution to another @lee2016introduction. Therefore, if shared data is accessed concurrently by different threads, the final result may depend on which thread executes first. This is known as a race condition. To solve this problem, inter-thread synchronization is needed, typically through mechanisms such as _mutexes_. These synchronization primitives allow only one thread to access a shared resource at a time while others wait. \
+Finally, threads are dynamic in the sense that they can be created and terminated during program execution. This is commonly referred as the _fork-join_ model#footnote[As threads are launched, the original execution sequence of the program splits into multiple parallel execution threads that run simultaneously, which can be thought of as a reversed fork. Later, the threads finish their tasks and join back with the main execution thread.].
 
-C++ provides native support for threads and mutexes through the <thread> and <mutex> libraries. The pseudocode below demonstrates an example of thread spawning. The instructions to perform take the form of function.
-```cpp 
+C++ provides native support for threads and mutexes through the #raw("<thread>") and #raw("<mutex>") libraries. The pseudocode below demonstrates an example of thread spawning and joining. The instructions to perform take the form of function.
+```cpp
 void writeOutput(arg){ ... }              // job to do
 
 std::thread myThread(writeOutput, args);  // launch
@@ -21,7 +21,7 @@ myThread.join();                          // wait for thread to finish
 === OpenMP
 
 OpenMP @openmp is a directive-based API and the most widely used shared memory programming model in scientific codes. It is built on threads, inheriting related paradigms, and hides thread spawning and joining from the developer through compiler directives that automatically generate parallel code. For example, a `for` loop can be parallelized as follows:
-```cpp 
+```cpp
 #pragma omp parallel for                  // compiler directive
 for (int i = 0; i < nCells; i++) {
   ...
@@ -31,9 +31,6 @@ OpenMP is designed to be easy to deploy and supports incremental parallelization
 
 === MPI
 
-MPI (Message Passing Interface) @MPI-standard is the standard solution for implementing distributed memory parallel programming. This library interface enables both data and task parallelism, i.e., executing subprograms in parallel. In this paradigm, MPI processes cannot access each other's data directly, as memory is distributed either virtually or physically. Therefore, processes must perform communication operations—one-sided, point-to-point, or collective—to exchange data.
+MPI (Message Passing Interface) @MPI-standard is the standard solution for implementing parallel programming adopting the distributed memory paradigm. This library interface enables both data and _task parallelism_, i.e., executing whole subprograms in parallel. In this paradigm, MPI processes cannot access each other's data directly, as memory is distributed either virtually or physically. Therefore, processes must perform communication operations, namely one-sided, point-to-point, or collective, to exchange data.
 
-The distributed memory model also requires an initial partitioning of data, such as the mesh in shallow water equation (SWE) solvers. In such cases, authors often rely on external libraries like METIS @metis to partition the domain in a way that minimizes inter-process communication. Although MPI can be used on a single multiprocessor system, it truly demonstrates its power when deployed across a cluster of CPU nodes.
-
-
-
+The distributed memory model also requires an initial partitioning of data, such as the mesh in SWE solvers. In such cases, authors often rely on external libraries like METIS @metis to partition the domain in a way that minimizes inter-process communication. Although MPI can be used on a single multiprocessor system, it truly demonstrates its power when deployed across a cluster of CPU nodes.

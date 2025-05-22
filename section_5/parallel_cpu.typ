@@ -6,16 +6,16 @@ As recalled in the state of the art, several technologies exist to implement the
 
 - The flux computation at each interface requires knowledge of the hydraulic variables $bold(U)$ from the left and right cells. Partitioning the cell array would then involve communication overhead to share ghost cell states surrounding boundary interfaces;
 
-- Although distributed memory implementations allow the processing of larger meshes that wouldn't fit into a single computer's RAM, we argue that the current Watlab implementation is still mainly limited by execution time, not memory.
+- Although distributed memory implementations allow the processing of larger meshes that would not fit into a single computer's RAM, we argue that the current Watlab implementation is still mainly limited by execution time, not memory.
 
-The previous study showed that using threads to parallelize output writing and OpenMP to parallelize loops was the most efficient and easy-to-deploy way to implement the shared-memory model @Gamba. The original Watlab implementation we received at the beginning of the year still contained a broken version of this approach, so our work was more a rehabilitation than a development from scratch.
+The previous study showed that using threads and mutex-based synchronization to parallelize output writing and OpenMP to parallelize loops was the most efficient and easy-to-deploy way to implement the shared-memory model @Gamba. The original Watlab implementation we received at the beginning of the year still contained a broken version of this approach, so our work was more a rehabilitation than a development from scratch.
 
-Regarding output, there's a small subtlety: writing and computation processes are not fully independent since they rely on the same data, namely the hydraulic variables. If the writing thread outputs concurrently while the finite-volume update is in progress, it leads to race conditions, as written values may vary between runs. To avoid this, careful synchronization is required. For example, computational threads can compute fluxes and source terms while cell data is being output since these intermediate values are not saved, but they must wait for the writing process to finish before altering the hydraulic variables during the finite-volume update. \
-However, I/O operations are time-consuming in C++, which would cause significant delays for computational threads. Instead, writer threads make a local copy of the data to output using a preallocated buffer, which is faster. On the other hand, synchronization relies on mutexes: when launched, writers lock a mutex to indicate they intend to buffer cell data. Once done, they release the mutex, signaling that the backup copy is ready and proceed to write to files. Meanwhile, after computing fluxes and source terms, the finite-volume threads try to lock the same mutexes and will wait if writers have not yet finished buffering.
+Regarding output, there is a small subtlety: writing and computation processes are not fully independent since they rely on the same data, namely the hydraulic variables. If the writing thread outputs concurrently while the finite-volume update is in progress, it leads to race conditions, as written values may vary between runs. To avoid this, careful synchronization is required. For example, computational threads can compute fluxes and source terms while cell data is being output since these intermediate values are not saved, but they must wait for the writing process to finish before altering the hydraulic variables during the finite-volume update. \
+To minimize idle times and avoid significant delays for computational threads and minimize idle times, writer threads make a local copy of the data to output using a preallocated buffer, which is faster than I/O operations. On the other hand, synchronization relies on mutexes: when launched, writers lock a mutex to indicate they intend to buffer cell data. Once done, they release the mutex, signaling that the backup copy is ready and proceed to write to files. Meanwhile, after computing fluxes and source terms, the finite-volume threads try to lock the same mutexes and will wait if writers have not yet finished buffering.
 
-Finally, we slightly modified the implementation of the minimum computation. The original approach parallelized the loop over cells using OpenMP, with each thread storing intermediate results in a thread-local variable before merging them to find the global minimum. Since loop iterations are distributed across OpenMP threads, this acts like a domain subdivision, although the cells within each local region may not be contiguous. However, the merging strategy was suboptimal: each thread compared its result with a global variable inside a critical section, making the merging inherently sequential with linear complexity in the number of threads.
+Finally, we slightly modified the implementation of the minimum computation. The original approach from @Gamba parallelized the loop over cells using OpenMP, with each thread storing intermediate results in a thread-local variable before merging them to find the global minimum. Since loop iterations are distributed across OpenMP threads, this acts like a domain subdivision, although the cells within each local region may not be contiguous. However, the merging strategy was suboptimal: each thread compared its result with a global variable inside a critical section, making the merging inherently sequential with linear complexity in the number of threads.
 
-This can be improved using a parallel reduction, which resembles a tournament: first, threads form pairs and compare values in parallel, then winners form new pairs and repeat the process until one thread remains. This reduces the global minimum in $log_2(T)$ steps instead of $T$, where $T$ is the number of threads. An illustrative diagram of the reduction strategy is shown in @reduction. While this optimization may have little impact with the small number of cores typical in modern CPUs, it becomes significant for GPU implementations with many more cores. For example, 2560 parallel processes would require only 12 reduction rounds.
+This can be improved using a parallel reduction, which resembles a tournament. First, threads form pairs and compare values in parallel, then winners form new pairs and repeat the process until one thread remains. This reduces the global minimum in $log_2(T)$ steps instead of $T$, where $T$ is the number of threads. An illustrative diagram of the reduction strategy is shown in @reduction. While this optimization may have little impact with the small number of cores typical in modern CPUs, it becomes significant for GPU implementations with many more cores. For example, 2560 parallel processes would require only 12 reduction rounds. Furthermore, it allows us to leverage cache memory because threads only need to know their local minimum and the local minimums of the other threads with which they compete.
 
 #import "@preview/fletcher:0.5.3" as fletcher: diagram, node, edge, measure-node-size
 
@@ -24,7 +24,7 @@ This can be improved using a parallel reduction, which resembles a tournament: f
     let canvas-size = measure(canvas)
     layout(size => {
       scale(size.width/canvas-size.width * 100%, canvas)
-    })  
+    })
   }
 }
 
@@ -93,8 +93,8 @@ This can be improved using a parallel reduction, which resembles a tournament: f
 )<reduction>
 
 Fortunately, OpenMP provides built-in support for parallel reduction via the reduction keyword, abstracting implementation details and simplifying the code, as shown in the following pseudocode:
-```cpp 
-#pragma omp parallel for reduction(min:tmin)         
+```cpp
+#pragma omp parallel for reduction(min:tmin)
 for (int i = 0; i < nCells; i++) {
   if (Cell[i].tmin < tmin) tmin = Cell[i].tmin;
 }
@@ -122,7 +122,7 @@ The updated structure of the final parallel implementation is shown in @hydroflo
     let canvas-size = measure(canvas)
     layout(size => {
       scale(100%, canvas)
-    })  
+    })
   }
 }
 
@@ -152,7 +152,7 @@ The updated structure of the final parallel implementation is shown in @hydroflo
   side += dy,
   edge("-|>"),
   blob((output_dx, side), [Write data], tint: green, name: <write>),
-  
+
   pos += dy,
   light_blob((2*shadow, pos), [ $ quad$], width: 41mm, tint: blue, name: <last_flux>),
   edge(<if.south>, (<last_flux.north-west>, 85%, <last_flux.north>), "-|>"),
@@ -232,5 +232,3 @@ In contrast, a cell-based approach as in @cell_based may feel more intuitive giv
 )
 
 The main caveat of the interface-based approach is the greater difficulty in parallelizing it. While interfaces are processed in parallel by multiple threads, two threads may attempt to access the same cell at the same time, potentially causing a race condition. To avoid this, cell buffers must be protected with mutexes, ensuring only one thread modifies them at a time. This adds some serialization overhead, but it remains low, as the typically large number of interfaces spread across threads makes simultaneous access to the same cell unlikely.
-
-

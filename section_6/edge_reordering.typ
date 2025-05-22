@@ -1,39 +1,38 @@
-To maximize coalesced memory access, neighboring threads should access neighboring entries in the cell and interface arrays. 
-In our parallel implementation, this applies primarily to the flux kernel, where each interface reads water heights from adjacent cells. 
-As discussed in @memory_section, applying the Reverse Cuthill-McKee algorithm to 
-renumber cell indices brings neighboring cells closer in memory, improving per-thread coalescence. 
-Sorting interfaces based on these new indices further enhances coalescence at the warp level, allowing threads to reuse 
+To maximize coalesced memory access, neighboring threads should access neighboring entries in the cell and interface arrays.
+In our parallel implementation, this applies primarily to the flux kernel, where each interface reads water heights from adjacent cells.
+As discussed in @memory_section, applying the Reverse Cuthill-McKee algorithm to
+renumber cell indices brings neighboring cells closer in memory, improving per-thread coalescence.
+Sorting interfaces based on these new indices further enhances coalescence at the warp level, allowing threads to reuse
 loaded data or access nearby values. A visualization of these accesses is shown in @mem_coalescence.
 
 #import "@preview/cetz:0.3.4": canvas, draw, decorations
 #import draw: rect, content, line, grid, mark, circle
 #figure(
-    gap: 5pt,
     placement: auto,
-    scale(90%, 
+    scale(90%,
     canvas({
-      
+
       let sm_color = teal.lighten(30%)
       let mem_color = red.lighten(10%)
       let core_color = green
       let chip_color = gray.lighten(80%)
       let chip_edge = gray.lighten(0%)
-    
+
       let w = 8
       let w_thread = (1/3) * .8
       let inset = .15 * 1
-    
+
       let mask = (14, 15, 16)
-    
+
       let off = 0
-    
+
       let row(y_off, mask) =  {
         /*let inset = 0
-          
+
         for i in range(0, 32) {
           if i not in mask {
             rect(
-            (inset + i * (w_thread + inset), y_off), (inset + i * (w_thread + inset) + w_thread, w_thread + y_off), 
+            (inset + i * (w_thread + inset), y_off), (inset + i * (w_thread + inset) + w_thread, w_thread + y_off),
               fill: core_color.lighten(80%), stroke: gray.lighten(20%)
             )
           }
@@ -41,23 +40,23 @@ loaded data or access nearby values. A visualization of these accesses is shown 
         for i in range(0, 32) {
             if i in mask {
               rect(
-                (inset + i * (w_thread + inset), y_off), (inset + i * (w_thread + inset) + w_thread, w_thread + y_off), 
+                (inset + i * (w_thread + inset), y_off), (inset + i * (w_thread + inset) + w_thread, w_thread + y_off),
                 fill: core_color, name: "core" + str(i)
               )
-            } 
+            }
           }
         for i in (1, 8, 16, 24, 32) {
             content((inset + w_thread/2 + (i -1) * (w_thread + inset), y_off - .25),  [#i])
           }*/
-        
+
           let dx = .75
           for i in mask {
             rect(
-              ((i+1) * (w_thread) + (i - 15) * dx, y_off), ((i+1) * (w_thread) + w_thread + (i - 15) * dx, w_thread + y_off), 
+              ((i+1) * (w_thread) + (i - 15) * dx, y_off), ((i+1) * (w_thread) + w_thread + (i - 15) * dx, w_thread + y_off),
               fill: core_color, name: "core" + str(i)
             )
             // content((i * (w_thread) + (i - 15) * dx + w_thread/2, y_off - .25),  [#i])
-          } 
+          }
       }
 
       let array(y_off, mask) =  {
@@ -73,10 +72,10 @@ loaded data or access nearby values. A visualization of these accesses is shown 
         for i in range(0, 32) {
             if i in mask {
                 rect(
-                  (i * (w_thread), y_off), (i * (w_thread) + w_thread, w_thread + y_off), 
+                  (i * (w_thread), y_off), (i * (w_thread) + w_thread, w_thread + y_off),
                   fill: mem_color, name: "mem" + str(i)
                 )
-              } 
+              }
         }
 
       }
@@ -122,7 +121,7 @@ loaded data or access nearby values. A visualization of these accesses is shown 
       line("core16.north", "mem19.south", ..line-style)
 
       content(( -7 * w_thread, dy + gap/3 + w_thread * .66), [*RCM + Sort*])
-    
+
       //grid((0,0), (w, w), help-lines: true)
     })),
     caption : [Idealized memory accesses in the flux kernel to retrieve $h_L$ and $h_R$]
@@ -143,7 +142,7 @@ We tested these strategies on the same test case as above to evaluate their effe
     (bottom: 0.7pt + black)
   },
   align: (x, y) => (
-    if x > 0 { center + horizon }
+    if x > 0 { center }
     else { left }
   )
 )
@@ -164,38 +163,38 @@ We tested these strategies on the same test case as above to evaluate their effe
 ), gap: .75em, caption: [Total execution times]),
 <poc_rcm>,
   figure(table(
-    columns: (16%, 21%, 31.5%, 31.5%),
+    columns: (1fr, 1fr, 1fr, 1fr),
     table.header(
       [Reordering],
       [Duration [#unit[ms]]],
-      [Compute Throughput [#unit[%]]],
-      [Memory Throughput [#unit[%]]],
+      [Compute \ Throughput [#unit[%]]],
+      [Memory \ Throughput [#unit[%]]],
     ),
     [RCM + Sort], [$0.90 thick (plus.minus 0.003)$], [$4.33 thick (plus.minus 0.015)$], [$63.93 thick (plus.minus 0.214)$],
-    [Variant], [$0.90 thick (plus.minus 0.003)$], [$4.32 thick (plus.minus 0.014)$], [$63.90 thick (plus.minus 0.210)$], 
+    [Variant], [$0.90 thick (plus.minus 0.003)$], [$4.32 thick (plus.minus 0.014)$], [$63.90 thick (plus.minus 0.210)$],
   ), gap: .75em, caption: [Flux kernel profiling]),
   <rcm_ker>,
   figure(table(
-    columns: (16%, 21%, 31.5%, 31.5%),
+    columns: (1fr, 1fr, 1fr, 1fr),
     table.header(
       [Reordering],
       [Duration [#unit[ms]]],
-      [Compute Throughput [#unit[%]]],
-      [Memory Throughput [#unit[%]]],
+      [Compute \ Throughput [#unit[%]]],
+      [Memory \ Throughput [#unit[%]]],
     ),
-    [RCM + Sort], [$0.29 thick (plus.minus 0.004)$], [$4.51 thick (plus.minus 0.053)$], [$86.68 thick (plus.minus 0.487)$], 
-    [Variant], [$0.29 thick (plus.minus 0.004)$], [$4.52 thick (plus.minus 0.056)$], [$86.62 thick (plus.minus 0.500)$], 
+    [RCM + Sort], [$0.29 thick (plus.minus 0.004)$], [$4.51 thick (plus.minus 0.053)$], [$86.68 thick (plus.minus 0.487)$],
+    [Variant], [$0.29 thick (plus.minus 0.004)$], [$4.52 thick (plus.minus 0.056)$], [$86.62 thick (plus.minus 0.500)$],
   ), gap: .75em, caption: [Update kernel profiling]),
   figure(table(
-    columns: (16%, 21%, 31.5%, 31.5%),
+    columns: (1fr, 1fr, 1fr, 1fr),
     table.header(
       [Reordering],
       [Duration [#unit[ms]]],
-      [Compute Throughput [#unit[%]]],
-      [Memory Throughput [#unit[%]]],
+      [Compute \ Throughput [#unit[%]]],
+      [Memory \ Throughput [#unit[%]]],
     ),
     [RCM + Sort], [$0.15 thick (plus.minus 0.000)$], [$9.42 thick (plus.minus 0.025)$], [$95.32 thick (plus.minus 0.214)$],
-    [Variant], [$0.15 thick (plus.minus 0.000)$], [$9.42 thick (plus.minus 0.025)$], [$95.29 thick (plus.minus 0.183)$], 
+    [Variant], [$0.15 thick (plus.minus 0.000)$], [$9.42 thick (plus.minus 0.025)$], [$95.29 thick (plus.minus 0.183)$],
   ),  gap: .75em, caption: [Min reduction profiling]),
   columns: 1,
   caption: [Timings of AdaptiveCpp implementation with reordered mesh (Toce _XL_)],
@@ -208,4 +207,3 @@ We tested these strategies on the same test case as above to evaluate their effe
 )
 
 We observe that the new reordering effectively reduces the execution time and the speedup factor increases from $~24$ to $~30.5$. Kernel profiling shows an increase in memory throughput, indicating an improvement in memory coalescence, that results in a decrease in the execution time. However, the boundary variant does not improve performance. We justify this by noting that warp divergence is not very pronounced in the PoC: boundary edges simply skip the mean water height computation, but as shown by kernel profiling, the limiting factor is memory access rather than computational load. Moreover, the reordering variant, while reducing warp divergence, also reduces spatial locality because the indices of the cells sharing a boundary interface are not direct neighbors except at corners. Finally, the number of boundary interfaces remains negligible compared to the number of inner interfaces in a large mesh as used in the test case.
-
