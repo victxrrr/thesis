@@ -73,8 +73,8 @@ Regarding simulation parameters, the CFL number is set to $sigma = 0.9$, and the
     [$n$ [#unit[-]]], [0.0162], [0.06],
     [$sigma$ [#unit[-]]], [0.9], [0.95],
     [$Delta t_"pics"$ [#unit[s]]], [1], [1],
-    [$Delta t_"gauges"$ [#unit[s]]], [1], [-],
-    [$Delta t_"sections"$ [#unit[s]]], [1], [-],
+    [$Delta t_"gauges"$ [#unit[s]]], [1], [--],
+    [$Delta t_"sections"$ [#unit[s]]], [1], [--],
     [$Delta t_"enveloppes"$ [#unit[s]]], [1], [1]
     ),
     gap: .75em,
@@ -84,8 +84,9 @@ Regarding simulation parameters, the CFL number is set to $sigma = 0.9$, and the
   columns: 1,
   caption: [Case study descriptions],
   kind: table,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1em
 )

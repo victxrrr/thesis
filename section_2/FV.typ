@@ -3,7 +3,12 @@
 #show: body => {
   for elem in body.children {
     if elem.func() == math.equation and elem.block {
-      let numbering = if "label" in elem.fields().keys() { "(1)" } else { none }
+      let numbering = if "label" in elem.fields().keys() {
+        n => {
+          let h1 = counter(heading).get().first()
+          numbering("(1.1)", h1, n)
+        }
+      } else { none }
       set math.equation(numbering: numbering)
       elem
     } else {

@@ -1,15 +1,15 @@
-To maximize coalesced memory access, neighboring threads should access neighboring entries in the cell and interface arrays.
-In our parallel implementation, this applies primarily to the flux kernel, where each interface reads water heights from adjacent cells.
+
+Although we changed the hardware on which the code runs, the renumbering strategy presented in @section_reordering would also be beneficial for the GPU implementation. To maximize coalesced memory access, neighboring threads should access neighboring entries in the cell and interface arrays.
+In our implementation, this applies primarily to the flux kernel, where each interface reads water heights from adjacent cells.
 As discussed in @memory_section, applying the Reverse Cuthill-McKee algorithm to
-renumber cell indices brings neighboring cells closer in memory, improving per-thread coalescence.
-Sorting interfaces based on these new indices further enhances coalescence at the warp level, allowing threads to reuse
-loaded data or access nearby values. A visualization of these accesses is shown in @mem_coalescence.
+renumber cell indices brings and sorting interfaces based on these new indices enhances memory coalescence in the flux kernel, allowing threads to reuse
+loaded data or access nearby values. A visualization of these accesses is shown in @mem_coalescence on a toy example with three CUDA threads. With the original mesh, two memory transactions are typically needed to deliver left and right water heights to all threads in the warp processing fluxes. Using solely RCM, it gets worse, as each thread only needs one memory transaction to retrieve adjacent heights, but the data needed by neighboring threads cannot be coalesced due to the stride, and two additional transactions would be needed. In the final reordering, the compact distribution of accessed cells leads to optimal memory coalescing.
 
 #import "@preview/cetz:0.3.4": canvas, draw, decorations
 #import draw: rect, content, line, grid, mark, circle
 #figure(
     placement: auto,
-    scale(90%,
+    scale(100%,
     canvas({
 
       let sm_color = teal.lighten(30%)
@@ -129,7 +129,7 @@ loaded data or access nearby values. A visualization of these accesses is shown 
 
 Coalesced memory is not the only benefit of mesh reordering. While clearly visible in the Proof of Concept due to its simplicity, it also reduces warp divergence. In Watlab, flux computations and cell updates vary when cell water heights fall below a user-defined threshold. These cells are considered dry, and no flux is computed between two dry cells. \
 Physically, water tends to form a contiguous wet zone as it propagates, with only the moving front expanding. This makes it likely that dry cells are surrounded by other dry cells, and similarly for wet cells, except near the wet-dry boundary. The RCM algorithm renumbers cells so that neighboring cells have nearby indices. Sorting interfaces by their left and right cells ensures that neighboring interfaces also have close indices. \
-As seen in @after_reordering, cell indices increase from the top-right to the bottom-left corner, and so do interface indices. This means contiguous threads in a warp are more likely to process cells in the same state—either wet or dry—leading to more uniform execution paths. Threads handling the moving front are the main exceptions.
+As seen in @after_reordering, cell indices increase from the top-right to the bottom-left corner, and so do interface indices. This means contiguous threads in a warp are more likely to process cells in the same state, either wet or dry, leading to more uniform execution paths. Threads handling the moving front are the main exceptions.
 
 The reasoning can be extended to boundary interfaces, which differ from inner ones as they have no right-side cells. Their flux computations are either simplified or follow hydrograph or limnigraph inputs. Since boundary conditions are applied uniformly across domain edges, which the mesh generator segments into similar interfaces, a good strategy is to start renumbering boundary edges in a counterclockwise order. This reduces warp divergence near domain edges. \
 GMSH already follows this approach, as seen in @square_mesh.
@@ -200,10 +200,11 @@ We tested these strategies on the same test case as above to evaluate their effe
   caption: [Timings of AdaptiveCpp implementation with reordered mesh (Toce _XL_)],
   kind: table,
   //label: <ncu>
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1em
 )
 
-We observe that the new reordering effectively reduces the execution time and the speedup factor increases from $~24$ to $~30.5$. Kernel profiling shows an increase in memory throughput, indicating an improvement in memory coalescence, that results in a decrease in the execution time. However, the boundary variant does not improve performance. We justify this by noting that warp divergence is not very pronounced in the PoC: boundary edges simply skip the mean water height computation, but as shown by kernel profiling, the limiting factor is memory access rather than computational load. Moreover, the reordering variant, while reducing warp divergence, also reduces spatial locality because the indices of the cells sharing a boundary interface are not direct neighbors except at corners. Finally, the number of boundary interfaces remains negligible compared to the number of inner interfaces in a large mesh as used in the test case.
+We observe that the new reordering effectively reduces the execution time and the speedup factor increases from $tilde 24$ to $tilde 30.5$. Kernel profiling shows an increase in memory throughput, indicating an improvement in memory coalescence, that results in a decrease in the execution time. However, the boundary variant does not improve performance. We justify this by noting that warp divergence is not very pronounced in the PoC. Indeed, Boundary edges simply skip the mean water height computation, but as shown by kernel profiling, the limiting factor is memory access rather than computational load. Moreover, the reordering variant, while reducing warp divergence, also reduces spatial locality because the indices of the cells sharing a boundary interface are not direct neighbors except at corners. Finally, the number of boundary interfaces remains negligible compared to the number of inner interfaces in a large mesh as used in the test case.

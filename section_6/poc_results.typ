@@ -2,7 +2,7 @@ When compiling OpenMP with GPU offloading, we received warnings about copying no
 
 Furthermore, implementing the PoC with RAJA revealed its backend-dependent API. Many constants and functions are prefixed with `cuda`/`hip`/`omp`/... requiring code duplication and macros to manage hardware-specific compilation. This makes the code impractical and insufficiently abstracted compared to other libraries. Consequently, RAJA will not be discussed further.
 
-Abstraction libraries such as Kokkos, Alpaka, and SYCL allow writing code that is easily understandable for developers with no prior GPU programming knowledge. Their abstraction paradigms differ significantly from one framework to another. Alpaka mainly relies on compile time templates with a syntax relatively close to CUDA by keeping kernel definitions. In contrast, Kokkos offers a higher level of abstraction by encapsulating data into `View` objects and by providing `parallel_for` constructs that easily offload loop processing to the GPU. The approach followed by the SYCL standard is quite singular and is based on events and queues. Jobs are submitted to a queue and executed on the GPU, either in order or out of order depending on the configuration. An illustrative example of Kokkos and SYCL pseudocode compared to CUDA implementation is given below.
+Abstraction libraries such as Kokkos, Alpaka, and SYCL allow writing code that is easily understandable for developers with no prior GPU programming knowledge. Their abstraction paradigms differ significantly from one framework to another. Alpaka mainly relies on compile time templates with a syntax relatively close to CUDA by keeping separate kernel definitions. In contrast, Kokkos offers a higher level of abstraction by encapsulating data into `View` objects and by providing `parallel_for` constructs that easily offload loop processing to the GPU. The approach followed by the SYCL standard is quite singular and is based on events and queues. Jobs are submitted to a queue and executed on the GPU, either in-order or out-of-order depending on the configuration. An illustrative example of Kokkos and SYCL pseudocode compared to CUDA implementation is given below.
 
 ```cpp
                           /* Transfer data host -> device */
@@ -128,12 +128,13 @@ A more reliable way to compare them is to use GPU specific profiling tools such 
   caption: [Per-kernel profiling],
   kind: table,
   label: <ncu>,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1em
 )
 This analysis shows that abstraction libraries are competitive with naive CUDA code while offering simplicity and portability. Furthermore, the low compute throughput shows that this PoC is an example of a memory bound algorithm. Between the two libraries we will choose AdaptiveCpp because its generic compiler feature allows the use of a single binary while maintaining competitive performance.
 
-Naturally, the Just-In-Time (JIT) mechanism introduces a small overhead. However, the authors of @SSCP report that it is of the same order of magnitude as the cost of the compilation step from IR to machine code already performed by backend drivers in current SYCL implementations. Only the first run of the program involves this JIT mechanism when a kernel execution is requested. Kernels are then cached as executable objects so that following runs do not need to retranslate them for the target architecture. To measure it precisely, we rebuilt the SYCL executable 100 times to discard cached kernels and executed it after the CUDA version to isolate the JIT overhead from GPU initialization, which also occurs during the first run of a GPU enabled program (for example, setting up drivers). The obtained mean execution time is $2.49 thick (plus.minus 0.05)$ seconds, giving an average overhead of
-$0.42$ seconds. Note that the overhead is independent of the test case size and depends only on the number of instructions and the complexity of the kernels.
+Naturally, the Just-In-Time (JIT) mechanism introduces a small overhead. However, the authors of @SSCP report that it is of the same order of magnitude as the overhead of compiling IR to machine code, already managed by backend drivers in existing SYCL implementations. Only the first run of the program involves this JIT mechanism when a kernel execution is requested. Kernels are then cached as executable objects so that following runs do not need to retranslate them for the target architecture. To measure it precisely, we rebuilt the SYCL executable 100 times to discard cached kernels and executed it after the CUDA version to isolate the JIT overhead from GPU initialization, which also occurs during the first run of a GPU enabled program (for example, setting up drivers). The obtained mean execution time is $2.49 thick (plus.minus 0.05)$ seconds, giving an average overhead of
+$0.42$ seconds. Note that the overhead is independent of the test case size and depends only on the number of instructions and the complexity of the kernel codes.

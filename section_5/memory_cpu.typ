@@ -32,15 +32,15 @@ To do this, we used Intel Advisor, which is able to analyze each function separa
   columns: 1,
   caption: [Roofline analysis of Hydroflow using Intel Advisor],
   placement: auto,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
   },
   gap: 1em
 )
-We see that all functions except dtMin lie below the peak bandwidth of the third cache. This suggests that greater use of the first and second cache levels may improve performance.
+We see that all functions except `dtMin` lie below the peak bandwidth of the third cache. This suggests that greater use of the first and second cache levels may improve performance.
 
-=== Leveraging caches
+=== Leveraging caches <section_reordering>
 
 From their inception, CPUs have continually become faster. Memory speeds have also increased, but not at the same pace as CPUs @ss. While a processor can perform several operations per clock cycle, accessing data from main memory can take tens of cycles @Eijkhout. This phenomenon is known as the _memory wall_ @memory_wall.
 
@@ -48,7 +48,7 @@ To alleviate this bottleneck, faster on-chip memory called _cache_ was developed
 
 When the CPU needs to read an address from main memory, it first checks whether the data is already present in the cache. If it is, this is called a _cache hit_. If not, it results in a _cache miss_, and the data must be loaded from main memory into a cache line, possibly evicting another line to make room, before being moved from the cache to the registers.
 
-Although cache behavior is managed by the hardware and not under direct programmer control, writing code with cache usage in mind can significantly improve performance. Specifically, maximizing _temporal_ and _spatial locality_ increases the likelihood of cache hits. Temporal locality refers to the tendency of programs to reuse the same data within short time intervals. Spatial locality means that programs tend to access memory locations that are close to each other @Eijkhout.
+Although cache behavior is managed by the hardware and not under direct programmer control, writing code with cache usage in mind can significantly improve performance. Specifically, maximizing _temporal_ and _spatial locality_ increases the likelihood of cache hits. Temporal locality refers to the tendency of programs to reuse the same data within short time intervals. Spatial locality characterizes that programs tend to access memory locations that are close to each other @Eijkhout.
 
 To evaluate the number of cache hits and misses during the execution of Watlab, we used Cachegrind, a tool from the Valgrind framework @Valgrind, which simulates cache behavior and provides line-by-line annotations of source code indicating the number of cache read and write misses.
 
@@ -63,6 +63,7 @@ Fortunately, this is precisely what the reverse Cuthill-McKee algorithm (RCM) ca
 To illustrate, we consider a simple square mesh composed of 26 triangular elements  (@square_mesh). The lower triangular part of the original symmetric adjacency matrix is shown in @adj_v1, while the upper triangular part represents the updated matrix after applying the reverse Cuthill-McKee algorithm. The bandwidth of the resulting matrix is much smaller, meaning that left and right cell indices of each interface are now closer in memory. \
 However, However, this renumbering strategy alone will not reduce the number of cache misses. This is because, while spatial locality is improved, temporal locality is simultaneously degraded. The colors of each entry in the adjacency matrices represent the corresponding interface indices, ranging from #text(fill: rgb("#03fcff"))[cyan] (low indices) to #text(fill: rgb("#fc03ff"))[pink] (high indices). In the initial lower matrix, we observe a smooth gradient from left to right. This is linked to how GMSH @GMSH, the mesh generator used to produce the mesh files feeding Watlab, numbers the interfaces. A closer look at @square_mesh reveals that it first numbers boundary interfaces in a counterclockwise manner. Then, inner interfaces are ordered by the left cell index and, for interfaces sharing the same left index, by the right cell index. As interfaces are processed in order, this improves temporal locality by increasing the likelihood of accessing common neighboring cells consecutively. \
 After reordering the cells, we lose this benefit. The new indices disrupt the original sorting, as shown by the shuffled colors in the updated adjacency matrix of @adj_v1. The solution, however, is quite straightforward. We can simply renumber the interfaces by sorting them based on the new left and right indices, using an algorithm like Quicksort @quicksort (@adj_v2). \
+This renumbering strategy was originally proposed by @LACASTA20141 in the context of GPU computing but we realised that it was also relevant for CPU execution, as demonstrated in the above discussion.
 
 #subpar.grid(
   figure(image("../img/no_RCM.svg", width: 81%), gap: .75em, caption: [
@@ -74,10 +75,11 @@ After reordering the cells, we lose this benefit. The new indices disrupt the or
   columns: 1,
   caption: [A simple square mesh with 26 cells and 45 interfaces],
   placement: auto,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1em
 )
 
 #subpar.grid(
@@ -90,10 +92,11 @@ After reordering the cells, we lose this benefit. The new indices disrupt the or
   columns: 1,
   caption: [Adjacency matrices related to the square mesh],
   placement: auto,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1em
 )
 
 

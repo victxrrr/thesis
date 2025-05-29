@@ -225,10 +225,11 @@ In contrast, a cell-based approach as in @cell_based may feel more intuitive giv
   columns: (1fr, 1fr),
   caption: [Memory accesses of flux balances],
   label: <memory_fluxes>,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1em
 )
 
 The main caveat of the interface-based approach is the greater difficulty in parallelizing it. While interfaces are processed in parallel by multiple threads, two threads may attempt to access the same cell at the same time, potentially causing a race condition. To avoid this, cell buffers must be protected with mutexes, ensuring only one thread modifies them at a time. This adds some serialization overhead, but it remains low, as the typically large number of interfaces spread across threads makes simultaneous access to the same cell unlikely.

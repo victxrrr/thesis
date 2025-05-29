@@ -25,7 +25,7 @@
       let width = canvas-size.width
       let width = size.width
       scale(width/canvas-size.width * 100%, canvas)
-    })  
+    })
   }
 }
 
@@ -62,7 +62,7 @@ The significant speedups achieved with the GPU port of the proof of concept moti
   side += dy,
   edge("-|>"),
   blob((output_dx, side), [Write data], tint: green, name: <write>),
-  
+
   pos += dy,
   blob((gpu_dx, pos), [$bold(F)_j^*$ #h(.5em) *for each* interface ], tint: blue, name: <flux>),
   edge((kernel_off, pos), <flux.west>, "@-|>", label: [], label-pos: .3),
@@ -108,9 +108,9 @@ The significant speedups achieved with the GPU port of the proof of concept moti
   // edge(<red>, <d2h>, "-|>", label: [$t = t + sigma Delta t$], label-side: left),
 
   // edge(<buf>, (0, 5.85), "-|>", label: [yes], label-side: left),
-  // 
+  //
 
-  let off = .4,
+  let off = 1.,
   edge(<write.south>, (output_dx, 4.4 + off), "-"),
   edge((output_dx, 4.4 + off), (output_dx, 5 + off), "--"),
 

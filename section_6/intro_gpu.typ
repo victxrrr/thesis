@@ -2,13 +2,13 @@ As introduced in the state of the art, Graphics Processing Units were originally
 
 #figure(
   box(
-    image("../img/drawing.svg", width: 75%),
+    image("../img/drawing.svg", width: 80%),
     clip: true,
     inset: (bottom: -10.5mm, top: -3mm))
     ,
   caption: [Insight behind Watlab's GPU implementation ]
 ) <drawing>
 
-We observe a clear parallel with our hydraulic solver: pixels are replaced by interfaces and cells, and the small, repeated computations become the calculation of fluxes, source terms, and finite-volume updates (@drawing). This intuition has driven research into using GPUs to accelerate SWE solvers and, more broadly, scientific simulations for over a decade. As reported in @TableSpeedups, many GPU implementations have achieved impressive speedups that are not attainable on CPUs due to their limited core count. It is therefore natural to want Watlab to benefit from this technology as well.
+We observe a clear parallel with our hydraulic solver. Pixels are replaced by interfaces and cells, and the small, repeated computations become the calculation of fluxes, source terms, and finite-volume updates (@drawing). This intuition has driven research into using GPUs to accelerate SWE solvers and, more broadly, scientific simulations for over a decade. As reported in @TableSpeedups, many GPU implementations have achieved impressive speedups that are not attainable on CPUs due to their limited core count. It is therefore natural to want Watlab to benefit from this technology as well.
 
-Reviewing the literature revealed that a key to efficient implementation on Graphics Processing Units is a solid understanding of their underlying architecture. We will therefore first present the hardware, followed by the programming abstraction built on top of it.
+Reviewing the literature revealed that a key to efficient implementation on Graphics Processing Units is a solid understanding of their underlying architecture. We will therefore first present the hardware, followed by the programming abstraction built on top of it. The following sections are based on the CUDA programming guide @nvidia2024cuda.

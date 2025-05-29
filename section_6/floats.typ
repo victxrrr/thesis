@@ -1,8 +1,8 @@
-A final point is that GPUs were originally built for graphics, where floating point precision matters less than in scientific computing. As a result, more transistors were historically dedicated to FP32 units than FP64. FP32 also uses half the memory of FP64, effectively doubling bandwidth. \
+A final point is that GPUs were originally built for graphics, where floating point precision matters less than in scientific computing. As a result, more transistors were historically dedicated to FP32 units than FP64. Furthermore, FP32 uses half the memory of FP64, effectively doubling bandwidth. \
 On high end datacenter hardware like the NVIDIA A100 (CC 8.0) or H100 (CC 9.0), double precision throughput is about half that of single precision, as shown in @TableArithmetic. On consumer GPUs designed for gaming or video editing, the gap is much larger. For example, on our NVIDIA RTX 4050 (CC 8.9), FP64 throughput is 64 times slower than FP32.
 Therefore, if a scientific application can tolerate reduced precision, it is always more efficient to use single precision.
 
-To illustrate the impact of arithmetic precision on GPU performance, we implemented a version of the SYCL code using the Structure of Arrays layout with reordered mesh, replacing doubles with floats. As before, profiling metrics are reported in @float_prof.(
+To illustrate the impact of arithmetic precision on GPU performance, we implemented a version of the SYCL code using the Structure of Arrays layout with reordered mesh, replacing doubles with floats. As before, profiling metrics are reported in @float_prof.
 
 #show table.cell.where(y: 0): strong
 #set table(
@@ -45,10 +45,11 @@ To illustrate the impact of arithmetic precision on GPU performance, we implemen
   caption: [Profile of AdaptiveCpp implementation with FP32 precision],
   kind: table,
   label: <float_prof>,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1em
 )
 
 Although this proof of concept is memory bound rather than compute bound, total execution time is reduced by about a factor of two. Kernel profiles show lower timings despite decreased compute throughput, indicating that FP32 resources remain underutilized. The update kernel is now over twice as fast, and the other two also show notable gains.

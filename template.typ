@@ -239,11 +239,11 @@ long } }
     set block(breakable: true)
     it
   }
-  set table(stroke: none)
+  set table(stroke: black)
 
   // Set raw text font.
   //show raw: set text(font: ("Iosevka", "Fira Mono"), size: 10pt)
-  show raw: set text(font: "Ubuntu Mono", size: 10pt)
+  show raw: set text(font: "Ubuntu Mono", size: 10.5pt)
   // show raw: set text(size: 10pt)
 
 

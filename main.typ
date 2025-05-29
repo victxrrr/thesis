@@ -1,4 +1,3 @@
-#import "@preview/glossarium:0.5.2": make-glossary, register-glossary, print-glossary, gls, glspl
 #import "template.typ": template, front-matter, main-matter, back-matter
 
 #show: template.with(author: "Victor Lepère")
@@ -50,6 +49,21 @@
     NPU \
     DPC++ \
     OpenGL \
+    CC \
+    VRAM \
+    PCIe \
+    DMA \
+    PoC \
+    JIT \
+    RCM \
+    AoS \
+    SoA \
+    AoSoA \
+    FP32 \
+    FP64 \
+    USM \
+    IR \
+    FMA \
   ],
   align(left)[#set par(leading: 1em)
     Shallow water equations \
@@ -75,46 +89,24 @@
     Neural Processing Unit \
     Data Parallel C++ \
     Open Graphics Library \
+    Compute Capability \
+    Video Random Access Memory \
+    Peripheral Component Interconnect Express \
+    Direct Memory Access \
+    Proof of Concept \
+    Just-In-Time \
+    Reverse Cuthill-McKee \
+    Array of Structures \
+    Structure of Arrays \
+    Array of Structures of Arrays \
+    Single-precision floating-point format \
+    Double-precision floating-point format \
+    Unified Shared Memory \
+    Intermediate Representation \
+    Fused Multiply-Add \
   ]
 )
 ]
-
-// #pagebreak()
-/*
-#show: make-glossary
-#let entry-list = (
-  (
-    key: "gpu",
-    short: "GPU",
-    long: "Graphic Processing Units",
-    // description: "A university in Belgium.",
-  ),
-   (
-    key: "cpu",
-    short: "GPU",
-    long: "Graphic Processing Units",
-    // description: "A university in Belgium.",
-  ),
-   (
-    key: "jpu",
-    short: "GPU",
-    long: "Graphic Processing Units",
-    // description: "A university in Belgium.",
-  ),
-   (
-    key: "kpu",
-    short: "GPU",
-    long: "Graphic Processing Units",
-    // description: "A university in Belgium.",
-  )
-)
-#register-glossary(entry-list)
-
-bitches
-#print-glossary(
- entry-list, show-all: true
-)
-*/
 
 #show: main-matter
 
@@ -128,13 +120,8 @@ bitches
 
 #show: main-matter
 = Introduction
+#include "section_1/intro.typ"
 
-
-hook
-problématique
-exemple parlant de pq on doit accelere
-// I love @gpu @cpu @jpu @kpu
-// #pagebreak()
 = Governing equations <ch2>
 #minioutline()
 
@@ -150,12 +137,12 @@ exemple parlant de pq on doit accelere
 
 #include "section_2/data_parallelism.typ"
 
-== Program structure
+== Program structure <structure_section>
 
 #include "section_2/program_struct.typ"
 
 // #pagebreak()
-= State of the art
+= State of the art <ch3>
 #minioutline()
 
 == Parallelization methods
@@ -175,7 +162,7 @@ exemple parlant de pq on doit accelere
 #include "section_3/trends_swe.typ"
 
 // #pagebreak()
-= Case studies
+= Case studies <ch4>
 #minioutline()
 
 #include "section_4/intro_case_studies.typ"
@@ -189,7 +176,7 @@ exemple parlant de pq on doit accelere
 #include "section_4/basin.typ"
 
 // #pagebreak()
-= Implementations on CPU
+= Implementations on CPU <ch5>
 #minioutline()
 
 #include "section_5/intro.typ"
@@ -202,7 +189,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_5/parallel_cpu.typ"
 
-== The precision issue
+== The precision issue <precision_section>
 
 #include "section_5/nondeterm.typ"
 
@@ -218,7 +205,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_5/cpu_case_studies.typ"
 
-= Implementations on GPU
+= Implementations on GPU <ch6>
 #minioutline()
 
 #include "section_6/intro_gpu.typ"
@@ -243,7 +230,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_6/intro_opti.typ"
 
-==== Mesh reordering
+==== Mesh reordering <section_gpu_reordering>
 
 #include "section_6/edge_reordering.typ"
 
@@ -261,7 +248,7 @@ exemple parlant de pq on doit accelere
 
 #include "section_6/gpu_port.typ"
 
-=== Polymorphism challenges
+=== Polymorphism challenges <section_poly>
 
 #include "section_6/poly.typ"
 
@@ -273,19 +260,20 @@ exemple parlant de pq on doit accelere
 
 #include "section_6/sync.typ"
 
-=== Benchmarks
+=== Analysis & benchmarks
 
 #include "section_6/bench.typ"
 
 // #pagebreak()
-= Perspectives
+= Perspectives <ch7>
+
+#include "section_7/perspectives.typ"
 
 // #pagebreak()
 = Conclusion
-
-// #pagebreak()
-= Acknowledgements
+#include "section_8/conclusion.typ"
 
 #show: back-matter
 // #pagebreak()
 #bibliography("ref.bib", full:false)
+Finally, generative artificial intelligence through ChatGPT and DeepL Write was used as a language assistant to review the spelling and grammar of the manuscript.

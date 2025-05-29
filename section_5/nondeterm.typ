@@ -27,7 +27,12 @@ calculer indexs locaux pour toujours faire les ops dans le meme ordre.
 #show: body => {
   for elem in body.children {
     if elem.func() == math.equation and elem.block {
-      let numbering = if "label" in elem.fields().keys() { "(1)" } else { none }
+      let numbering = if "label" in elem.fields().keys() {
+        n => {
+          let h1 = counter(heading).get().first()
+          numbering("(1.1)", h1, n)
+        }
+      } else { none }
       set math.equation(numbering: numbering)
       elem
     } else {
@@ -64,10 +69,11 @@ the maximum relative error tend to increase over time.
   columns: (1fr, 1fr),
   caption: [Nondeterministic behavior of parallel implementation],
   label: <fig_nondeterm>,
-  numbering: n => {
-    let h1 = counter(heading).get().first()
-    numbering("1.1", h1, n)
-  }, gap: 1.5em
+  numbering: n => numbering("1.1", ..counter(heading.where(level: 1)).get(), n),
+  numbering-sub-ref: (..n) => {
+    numbering("1.1a", ..counter(heading.where(level: 1)).get(), ..n)
+  },
+  gap: 1.5em
 )
 
 // #subpar.grid(

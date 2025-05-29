@@ -17,6 +17,34 @@ title = {Introduction to High Performance Scientific Computing},
 doi = {10.5281/zenodo.49897}
 }
 
+@manual{nvidia_nsight_compute_docs,
+  title        = {Nsight Compute :: Profiling CUDA Applications},
+  author       = {{NVIDIA Corporation}},
+  year         = {2024},
+  note         = {Accessed May 2025},
+  url          = {https://docs.nvidia.com/nsight-compute/}
+}
+
+% Alternative Clang citation with more detail
+@inproceedings{llvm,
+  title={{LLVM}: A compilation framework for lifelong program analysis \& transformation},
+  author={Lattner, Chris and Adve, Vikram},
+  booktitle={International Symposium on Code Generation and Optimization, 2004. CGO 2004.},
+  pages={75--86},
+  year={2004},
+  organization={IEEE}
+}
+
+@manual{nvidia_cuda_floating_point,
+  title        = {Floating Point and IEEE 754 Compliance for {NVIDIA} {GPUs}},
+  author       = {Nathan Whitehead and Alex Fit-Florea},
+  organization = {NVIDIA Corporation},
+  year         = {2019},
+  note         = {White paper covering the most common issues related to NVIDIA GPUs},
+  url          = {https://docs.nvidia.com/cuda/floating-point/index.html},
+  urldate      = {2025-05-28}
+}
+
 @article{RL,
 author = {Williams, Samuel and Waterman, Andrew and Patterson, David},
 title = {Roofline: an insightful visual performance model for multicore architectures},
@@ -400,6 +428,91 @@ High-performance calculations are of great importance to the simulation of dam-b
   author = {Free Software Foundation, Inc.},
   year = {2024},
   url = {https://gcc.gnu.org/}
+}
+
+@article{nhess-22-3831-2022,
+author = {Koks, E. E. and van Ginkel, K. C. H. and van Marle, M. J. E. and Lemnitzer, A.},
+title = {Brief communication: Critical infrastructure impacts of the 2021 mid-July western European flood event},
+journal = {Natural Hazards and Earth System Sciences},
+volume = {22},
+year = {2022},
+number = {12},
+pages = {3831--3838},
+url = {https://nhess.copernicus.org/articles/22/3831/2022/},
+doi = {10.5194/nhess-22-3831-2022}
+}
+
+@article{nhess-23-525-2023,
+author = {Mohr, S. and Ehret, U. and Kunz, M. and Ludwig, P. and Caldas-Alvarez, A. and Daniell, J. E. and Ehmele, F. and Feldmann, H. and Franca, M. J. and Gattke, C. and Hundhausen, M. and Knippertz, P. and K\"upfer, K. and M\"uhr, B. and Pinto, J. G. and Quinting, J. and Sch\"afer, A. M. and Scheibel, M. and Seidel, F. and Wisotzky, C.},
+title = {A multi-disciplinary analysis of the exceptional flood event of July 2021 in central Europe -- Part 1: Event description and analysis},
+journal = {Natural Hazards and Earth System Sciences},
+volume = {23},
+year = {2023},
+number = {2},
+pages = {525--551},
+url = {https://nhess.copernicus.org/articles/23/525/2023/},
+doi = {10.5194/nhess-23-525-2023}
+}
+
+@techreport{EEA2024ClimateHealth,
+  author = {{European Environment Agency}},
+  title = {Responding to climate change impacts on human health in Europe: focus on floods, droughts and water quality},
+  year = {2024},
+  institution = {European Environment Agency},
+  type = {EEA Report},
+  number = {No 3/2024}
+}
+
+@Article{nhess-24-673-2024,
+AUTHOR = {Arrighi, C. and Domeneghetti, A.},
+TITLE = {Brief communication: On the environmental impacts of the 2023 floods in
+Emilia-Romagna (Italy)},
+JOURNAL = {Natural Hazards and Earth System Sciences},
+VOLUME = {24},
+YEAR = {2024},
+NUMBER = {2},
+PAGES = {673--679},
+URL = {https://nhess.copernicus.org/articles/24/673/2024/},
+DOI = {10.5194/nhess-24-673-2024}
+}
+
+@techreport{Barnes,
+  author      = {Barnes, C. and Coppola, E. and Faranda, D. and Grazzini, F.
+                 and Heinrich, D. and Kimutai, J. and Lu, C. and Otto, F.
+                 and Pereira, C. M. and Pinto, I. and Sengupta, S.
+                 and Singh, R. and Vahlberg, M. and Zachariah, M.},
+  title       = {Limited net role for climate change in heavy spring rainfall in Emilia-Romagna},
+  institution = {Imperial College London},
+  year        = {2023},
+  month       = {31 May},
+  doi         = {10.25561/104550},
+  url         = {https://doi.org/10.25561/104550},
+  type        = {Climate Attribution Study},
+  note        = {World Weather Attribution initiative}
+}
+
+@techreport{C3S_WMO_2025,
+  author      = {{Copernicus Climate Change Service (C3S)} and {World Meteorological Organization (WMO)}},
+  title       = {European State of the Climate 2024},
+  year        = {2025},
+  institution = {Copernicus Publications},
+  url         = {https://climate.copernicus.eu/ESOTC/2024},
+  doi         = {10.24381/14j9-s541},
+  type        = {Annual Climate Report},
+  series      = {European State of the Climate},
+  note        = {Accessed: [Insert Access Date Here]}
+}
+
+@techreport{cred,
+  author      = {Centre for Research on the Epidemiology of Disasters},
+  title       = {Extreme weather events in Europe},
+  institution = {Universit{\'e} catholique de Louvain},
+  year        = {2021},
+  type        = {CRED Crunch},
+  number      = {64},
+  url         = {https://cred.be/sites/default/files/CredCrunch64.pdf},
+  note        = {last access: 8 August 2023},
+  series      = {CRED Crunch}
 }
 
 @inproceedings{sycl_bench,
@@ -1091,6 +1204,16 @@ journal = {Writing Scientific Software: A Guide for Good Style},
 doi = {10.1017/CBO9780511617973}
 }
 
+@article{haswell,
+author = {Jain, Tarush and Agrawal, Tanmay},
+year = {2013},
+month = {04},
+pages = {477-480},
+title = {The Haswell Microarchitecture - 4th Generation Processor},
+volume = {4(3)},
+journal = {International Journal of Computer Science and Information Technologies}
+}
+
 @article{memory_wall,
 author = {Wulf, Wm and McKee, Sally},
 year = {1996},
@@ -1189,4 +1312,13 @@ doi = {10.1109/ACCESS.2016.2586309}
   year         = {2025},
   howpublished = {\url{https://github.com/AdaptiveCpp/AdaptiveCpp/blob/develop/doc/performance.md}},
   note         = {Accessed: 2025-05-10}
+}
+
+@manual{clang_manual,
+  title = {Clang Compiler User's Manual},
+  author = {{LLVM Project}},
+  organization = {LLVM Project},
+  year = {2024},
+  url = {https://clang.llvm.org/docs/UsersManual.html},
+  note = {Accessed: May 2025}
 }
